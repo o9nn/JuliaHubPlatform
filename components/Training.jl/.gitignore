@@ -1,0 +1,7 @@
+/Manifest.toml
+jupyter_notebooks
+*.ipynb_checkpoints
+*.png
+*.csv
+*ne_110m_admin*
+*.log

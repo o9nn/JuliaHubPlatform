@@ -1,0 +1,13 @@
+name: run-compartmental-model-server
+on: [push]
+jobs:
+  run-server-on-arch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: nightly
+          arch: arm
+      - run: uname -a
+      - run: julia --project=@. -e '"using Pkg; Pkg.test()"'

@@ -1,0 +1,17 @@
+name = "Hydration"
+uuid = "34dc154a-538c-46a5-bd37-00ae0192372e"
+authors = ["Frames White <me@oxinabox.net> and contributors"]
+version = "1.0.0-DEV"
+
+[deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
