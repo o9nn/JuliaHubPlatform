@@ -1,0 +1,139 @@
+# This code is derived from the Modia project and is licensed as follows:
+# https://github.com/ModiaSim/Modia.jl/blob/b61daad643ef7edd0c1ccce6bf462c6acfb4ad1a/LICENSE
+
+function try_assign_eq!(ict::IncrementalCycleTracker, vj::Integer, eq::Integer)
+    G = ict.graph
+    add_edge_checked!(ict, Iterators.filter(!=(vj), 𝑠neighbors(G.graph, eq)), vj) do G
+        G.matching[vj] = eq
+        G.ne += length(𝑠neighbors(G.graph, eq)) - 1
+    end
+end
+
+function try_assign_eq!(ict::IncrementalCycleTracker, vars, v_active, eq::Integer,
+        condition::F = _ -> true) where {F}
+    G = ict.graph
+    for vj in vars
+        (vj in v_active && G.matching[vj] === unassigned && condition(vj)) || continue
+        try_assign_eq!(ict, vj, eq) && return true
+    end
+    return false
+end
+
+function tearEquations!(ict::IncrementalCycleTracker, Gsolvable, es::Vector{Int},
+        v_active::BitSet, isder′::F) where {F}
+    check_der = isder′ !== nothing
+    if check_der
+        has_der = Ref(false)
+        isder = let has_der = has_der, isder′ = isder′
+            v -> begin
+                r = isder′(v)
+                has_der[] |= r
+                r
+            end
+        end
+    end
+    # Heuristic: As a first pass, try to assign any equations that only have one
+    # solvable variable.
+    for only_single_solvable in (true, false)
+        for eq in es  # iterate only over equations that are not in eSolvedFixed
+            vs = Gsolvable[eq]
+            ((length(vs) == 1) ⊻ only_single_solvable) && continue
+            if check_der
+                # if there're differentiated variables, then only consider them
+                try_assign_eq!(ict, vs, v_active, eq, isder)
+                if has_der[]
+                    has_der[] = false
+                    continue
+                end
+            end
+            try_assign_eq!(ict, vs, v_active, eq)
+        end
+    end
+
+    return ict
+end
+
+function tear_graph_block_modia!(var_eq_matching, ict, solvable_graph, eqs, vars,
+        isder::F) where {F}
+    tearEquations!(ict, solvable_graph.fadjlist, eqs, vars, isder)
+    for var in vars
+        var_eq_matching[var] = ict.graph.matching[var]
+    end
+    return nothing
+end
+
+@kwdef struct ModiaTearing{F, F2, F3} <: TearingAlgorithm
+    isder::F = nothing
+    varfilter::F2 = (_ -> true)
+    eqfilter::F3 = (_ -> true)
+end
+
+function (alg::ModiaTearing)(structure::SystemStructure)
+    result = StateSelection.tear_graph_modia(structure, alg.isder;
+                                             varfilter = alg.varfilter,
+                                             eqfilter = alg.eqfilter)
+    var_eq_matching, full_var_eq_matching, var_sccs = result
+    return TearingResult(var_eq_matching, full_var_eq_matching, var_sccs), (;)
+end
+
+function tear_graph_modia(structure::SystemStructure, isder::F = nothing,
+        ::Type{U} = Unassigned;
+        varfilter::F2 = v -> true,
+        eqfilter::F3 = eq -> true) where {F, U, F2, F3}
+    # It would be possible here to simply iterate over all variables and attempt to
+    # use tearEquations! to produce a matching that greedily selects the minimal
+    # number of torn variables. However, we can do this process faster if we first
+    # compute the strongly connected components. In the absence of cycles and
+    # non-solvability, a maximal matching on the original graph will give us an
+    # optimal assignment. However, even with cycles, we can use the maximal matching
+    # to give us a good starting point for a good matching and then proceed to
+    # reverse edges in each scc to improve the solution. Note that it is possible
+    # to have optimal solutions that cannot be found by this process. We will not
+    # find them here [TODO: It would be good to have an explicit example of this.]
+
+    (; graph, solvable_graph) = structure
+    var_eq_matching = maximal_matching(graph, U,
+        srcfilter=eqfilter,
+        dstfilter=varfilter)
+    var_eq_matching = complete(var_eq_matching,
+        max(length(var_eq_matching),
+            maximum(x -> x isa Int ? x : 0, var_eq_matching, init = 0)))
+    full_var_eq_matching = copy(var_eq_matching)
+    var_sccs = find_var_sccs(graph, var_eq_matching)
+    vargraph = DiCMOBiGraph{true}(graph)
+    # Inlining `IncrementalCycleTracker(vargraph; dir = :in)` because calling it
+    # directly doesn't infer.
+    ict = Graphs.DenseGraphICT_BFGT_N{:in}(vargraph)
+
+    ieqs = Int[]
+    filtered_vars = BitSet()
+    free_eqs = free_equations(graph, var_sccs, var_eq_matching, varfilter)
+    is_overdetemined = !isempty(free_eqs)
+    for vars in var_sccs
+        for var in vars
+            if varfilter(var)
+                push!(filtered_vars, var)
+                if var_eq_matching[var] !== unassigned
+                    push!(ieqs, var_eq_matching[var])
+                end
+            end
+            var_eq_matching[var] = unassigned
+        end
+        tear_graph_block_modia!(var_eq_matching, ict, solvable_graph, ieqs,
+            filtered_vars,
+            isder)
+
+        # If the systems is overdetemined, we cannot assume the free equations
+        # will not form algebraic loops with equations in the sccs.
+        if !is_overdetemined
+            # clear cache
+            vargraph.ne = 0
+            for var in vars
+                vargraph.matching[var] = unassigned
+            end
+        end
+        empty!(ieqs)
+        empty!(filtered_vars)
+    end
+    return var_eq_matching, full_var_eq_matching, var_sccs
+end

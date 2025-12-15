@@ -1,0 +1,136 @@
+[package]
+name = "juliaup"
+version = "1.18.9"
+description = "Julia installer and version multiplexer"
+repository = "https://github.com/julialang/juliaup"
+license = "MIT"
+keywords = ["julia"]
+categories = ["command-line-utilities"]
+edition = "2021"
+default-run = "juliaup"
+authors = ["David Anthoff <anthoff@berkeley.edu>"]
+exclude = [
+    ".github/**",
+    ".vscode/**",
+    ".wix/**",
+    "deploy/**",
+    "devdocs/**",
+    "scripts/**",
+    "download_bundled_julia.ps1",
+]
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4", features = ["derive", "color", "wrap_help"] }
+clap_complete = "4"
+clap_complete_nushell = "4"
+dirs = "6"
+dunce = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+semver = "1"
+anyhow = "1"
+tempfile = "3"
+flate2 = "1"
+tar = "0.4"
+normpath = "1"
+fs_extra = "1"
+thiserror = "2"
+indicatif = "0.18"
+console = "0.16"
+ctrlc = "3"
+url = "2"
+cli-table = "0.5"
+itertools = "0.14"
+cluFlock = "1"
+chrono = { version = "0.4", features = ["serde"] }
+human-panic = "2"
+log = "0.4"
+env_logger = "0.11"
+dialoguer = "0.12"
+shellexpand = "3"
+env_proxy = "0.4"
+bstr = "1"
+indoc = "2"
+is-terminal = "0.4"
+path-absolutize = "3"
+numeric-sort = "0.1"
+regex = "1"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = ["Win32_Foundation", "Win32_UI_Shell", "Win32_Security", "Win32_System_JobObjects", "Win32_System_Console", "Win32_System_Threading", "Services_Store", "Foundation", "Foundation_Collections", "Web_Http", "Web_Http_Headers", "Storage_Streams", "Management_Deployment"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "native-tls", "socks"] }
+
+[target.'cfg(all(not(target_os = "macos"),not(windows)))'.dependencies]
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls-native-roots", "socks"] }
+
+[target.'cfg(not(windows))'.dependencies]
+nix = { version = "0.30", features = ["process"] }
+
+[build-dependencies]
+anyhow = "1"
+itertools = "0.14"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+semver = "1"
+built = "0.8"
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
+
+[dev-dependencies]
+assert_cmd = "2"
+assert_fs = "1"
+indoc = "2"
+predicates = "3"
+
+[features]
+selfupdate = []
+windowsstore = []
+windowsappinstaller = []
+dummy = []
+binjuliainstaller = []
+binjulialauncher = []
+winpkgidentityext = []
+
+[package.metadata.msix]
+winstoremsix = { file = "deploy/msix/PackagingLayout.xml", variables = [
+    {name = "FlatBundle", value="false"},
+    {name = "PublisherDisplayName", value="JuliaHub, Inc."},
+    {name = "IdentityPublisher", value = "CN=7FB784C5-4411-4067-914E-A7B06CC00FFC"}
+] }
+winappinstallermsix = { file = "deploy/msix/PackagingLayout.xml", variables = [
+    {name = "FlatBundle", value="true"},
+    {name = "PublisherDisplayName", value="JuliaHub, Inc."},
+    {name = "IdentityPublisher", value = "CN=&quot;JuliaHub, Inc.&quot;, O=&quot;JuliaHub, Inc.&quot;, L=CAMBRIDGE, S=Massachusetts, C=US"}
+] }
+
+[package.metadata.winappinstaller]
+winappinstaller = "deploy/winappinstaller/Julia.appinstaller"
+
+[package.metadata.winres]
+
+[[bin]]
+name = "julia"
+path = "src/bin/julialauncher.rs"
+
+[[bin]]
+name = "julialauncher"
+path = "src/bin/julialauncher.rs"
+required-features = ["binjulialauncher"]
+
+[[bin]]
+name = "juliaup"
+path = "src/bin/juliaup.rs"
+
+[[bin]]
+name = "juliainstaller"
+path = "src/bin/juliainstaller.rs"
+required-features = ["binjuliainstaller"]

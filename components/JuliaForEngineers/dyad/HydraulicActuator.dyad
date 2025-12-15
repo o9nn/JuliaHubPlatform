@@ -1,0 +1,64 @@
+component HydraulicActuator_steady
+    parameter x_dot::Real = 1
+    parameter A::Real = 0.1
+    parameter ps::Real = 300e5
+    parameter pr::Real = 0
+    parameter rho::Real = 1000
+    parameter Cd::Real = 2.7
+    parameter c::Real = 1000
+
+    variable A0::Real
+    variable u::Real
+    variable p1::Real
+    variable p2::Real
+relations
+    initial A0 = 0.001
+    initial u = 100
+
+    u = x_dot * (A / A0)
+    ps - p1 = (1/2) * rho * (u^2) * Cd
+    p2 - pr = (1/2) * rho * (u^2) * Cd
+    0 = (p1 - p2) * A - c * x_dot
+end
+
+component HydraulicActuator_dynamic
+    parameter A0::Real = 0.00095
+    parameter A::Real = 0.1
+    parameter ps::Real = 300e5
+    parameter pr::Real = 0
+    parameter rho::Real = 1000
+    parameter Cd::Real = 2.7
+    parameter c::Real = 1000
+    parameter m::Real = 100
+
+    variable x::Real
+    variable x_dot::Real
+    variable x_ddot::Real
+    variable u::Real
+    variable p1::Real
+    variable p2::Real
+relations
+    initial x = 0
+    initial x_dot = 0
+
+    der(x) = x_dot
+    der(x_dot) = x_ddot
+
+    u = x_dot * (A / A0)
+    ps - p1 = (1/2) * rho * (u^2) * Cd
+    p2 - pr = (1/2) * rho * (u^2) * Cd
+    m * x_ddot = (p1 - p2) * A - c * x_dot
+end
+
+
+
+
+
+
+
+
+
+analysis SimActuator
+    extends DyadInterface.SteadyStateAnalysis(abstol=1e-9)
+    model = HydraulicActuator_steady()
+end

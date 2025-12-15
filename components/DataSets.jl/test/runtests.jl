@@ -1,0 +1,268 @@
+ENV["JULIA_DATASETS_PATH"] = ""
+
+using DataSets
+using Test
+using UUIDs
+using ResourceContexts
+using TOML
+
+using DataSets: FileSystemRoot
+
+@testset "register_post_init_callback" begin
+    init_was_called = Ref(false)
+    DataSets.register_post_init_callback() do
+        init_was_called[] = true
+    end
+    @test init_was_called[]
+end
+
+@testset "DataSet config" begin
+    proj = DataSets.load_project("Data.toml")
+
+    ds = dataset(proj, "a_text_file")
+    @test ds.uuid == UUID("b498f769-a7f6-4f67-8d74-40b770398f26")
+    @test ds.name == "a_text_file"
+    @test ds.description == "A text file"
+    @test ds.storage["driver"] == "FileSystem"
+end
+
+@testset "DataSet config from Dict" begin
+    config = Dict(
+        "data_config_version"=>0,
+        "datasets"=>[Dict(
+            "description"=>"A text file",
+            "name"=>"a_text_file",
+            "uuid"=>"b498f769-a7f6-4f67-8d74-40b770398f26",
+
+            "storage"=>Dict(
+                "driver"=>"FileSystem",
+                "type"=>"Blob",
+                "path"=>joinpath(@__DIR__, "data", "file.txt")
+               )
+           )]
+       )
+
+    proj = DataSets.load_project(config)
+
+    ds = dataset(proj, "a_text_file")
+    @test ds.uuid == UUID("b498f769-a7f6-4f67-8d74-40b770398f26")
+
+    # Exercise the show() methods
+    let s = sprint(show, ds)
+        @test occursin("a_text_file", s)
+        @test occursin("b498f769-a7f6-4f67-8d74-40b770398f26", s)
+    end
+    let s = sprint(show, "text/plain", ds)
+        parsed = TOML.parse(s)
+        @test parsed isa Dict
+        @test parsed["name"] == "a_text_file"
+        @test parsed["uuid"] == "b498f769-a7f6-4f67-8d74-40b770398f26"
+    end
+
+    # Test show() methods when there are values that are not serializable
+    # into TOML in the Dict
+    config["datasets"][1]["foo"] = nothing
+    config["datasets"][1]["bar"] = [1, 2, nothing, Dict("x" => nothing, "y" => "y")]
+    config["datasets"][1]["baz"] = Dict(
+        "x" => nothing, "y" => "y",
+    )
+    proj = DataSets.load_project(config)
+    ds = dataset(proj, "a_text_file")
+    let s = sprint(show, "text/plain", ds)
+        # It looks like that in Julia <= 1.8.0, the TOML.print(f, ...) variant
+        # for arbitrary types does not actually work, since it's missing the fallback
+        # implementation and has other bugs, depending on the Julia version.
+        #
+        # So the `show()`-ed TOML will not parse again. But since we have a try-catch anyway,
+        # we don't care too much, so we just run a simplified test in that case.
+        if VERSION >= v"1.9.0"
+            parsed = TOML.parse(s)
+            @test parsed isa Dict
+            @test parsed["name"] == "a_text_file"
+            @test parsed["uuid"] == "b498f769-a7f6-4f67-8d74-40b770398f26"
+            @test parsed["foo"] == "<unserializable>"
+            @test parsed["bar"] == [1, 2, "<unserializable>", Dict("x" => "<unserializable>", "y" => "y")]
+            @test parsed["baz"] == Dict("x" => "<unserializable>", "y" => "y")
+        else
+            @test occursin("<unserializable>", s)
+        end
+    end
+
+    # Also test bad keys
+    config["datasets"][1]["keys"] = Dict(
+        nothing => 123,
+        1234 => "bad",
+    )
+    proj = DataSets.load_project(config)
+    ds = dataset(proj, "a_text_file")
+    let s = sprint(show, "text/plain", ds)
+        endswith(s, "\n... <unserializable>\nSet JULIA_DEBUG=DataSets to see the error")
+    end
+end
+
+@testset "open() for DataSet" begin
+    proj = DataSets.load_project("Data.toml")
+
+    text_data = dataset(proj, "a_text_file")
+    @test open(text_data) isa Blob
+    @test read(open(text_data), String) == "Hello world!\n"
+    @context begin
+        @test read(@!(open(text_data)), String) == "Hello world!\n"
+    end
+
+    tree_data = dataset(proj, "a_tree_example")
+    @test open(tree_data) isa BlobTree
+    @context begin
+        @test @!(open(tree_data)) isa BlobTree
+        tree = @! open(tree_data)
+        @test readdir(tree) == ["1.csv", "2.csv"]
+    end
+
+    blob_in_tree_data = dataset(proj, "a_tree_example#1.csv")
+    @test open(blob_in_tree_data) isa Blob
+    @context begin
+        @test @!(open(String, blob_in_tree_data)) == """Name,Age\n"Aaron",23\n"Harry",42\n"""
+    end
+end
+
+#-------------------------------------------------------------------------------
+@testset "open() for Blob and BlobTree" begin
+    blob = Blob(FileSystemRoot("data/file.txt"))
+    @test        open(identity, String, blob)         == "Hello world!\n"
+    @test String(open(identity, Vector{UInt8}, blob)) == "Hello world!\n"
+    @test open(io->read(io,String), IO, blob)         == "Hello world!\n"
+    @test open(identity, Blob, blob) === blob
+    # Unscoped forms
+    @test open(String, blob)                == "Hello world!\n"
+    @test String(open(Vector{UInt8}, blob)) == "Hello world!\n"
+    @test read(open(IO, blob), String)      == "Hello world!\n"
+
+    tree = BlobTree(FileSystemRoot("data"))
+    @test open(identity, BlobTree, tree) === tree
+
+    # Context-based forms
+    @context begin
+        @test @!(open(String, blob))               == "Hello world!\n"
+        @test String(@! open(Vector{UInt8}, blob)) == "Hello world!\n"
+        @test read(@!(open(IO, blob)), String)     == "Hello world!\n"
+        @test @!(open(Blob, blob))                 === blob
+        @test @!(open(BlobTree, tree))             === tree
+    end
+end
+
+#-------------------------------------------------------------------------------
+function load_list(filename)
+    lines = eachline(joinpath(@__DIR__, filename))
+    filter(!isempty, strip.(lines))
+end
+@testset "Data set name parsing" begin
+    @testset "Valid names" begin
+        valid_names = load_list("testnames-valid.txt")
+        @test !isempty(valid_names)
+        @testset "Valid name: $name" for name in valid_names
+            @test DataSets.check_dataset_name(name) === nothing
+            @test DataSets._split_dataspec(name) == (name, nothing, nothing)
+            # Also test that the name is still valid when it appears as part of
+            # a path elements.
+            let path_name = "foo/$(name)"
+                @test DataSets.check_dataset_name(path_name) === nothing
+                @test DataSets._split_dataspec(path_name) == (path_name, nothing, nothing)
+            end
+            let path_name = "$(name)/foo"
+                @test DataSets.check_dataset_name(path_name) === nothing
+                @test DataSets._split_dataspec(path_name) == (path_name, nothing, nothing)
+            end
+            let path_name = "foo/$(name)/bar"
+                @test DataSets.check_dataset_name(path_name) === nothing
+                @test DataSets._split_dataspec(path_name) == (path_name, nothing, nothing)
+            end
+        end
+    end
+
+    @testset "Invalid names" begin
+        invalid_names = load_list("testnames-invalid.txt")
+        @test !isempty(invalid_names)
+        @testset "Invalid name: $name" for name in invalid_names
+            @test_throws ErrorException DataSets.check_dataset_name(name)
+            @test DataSets._split_dataspec(name) == (nothing, nothing, nothing)
+            # Also test that the name is still invalid when it appears as part of
+            # a path elements.
+            let path_name = "foo/$(name)"
+                @test_throws ErrorException DataSets.check_dataset_name(path_name) === nothing
+                @test DataSets._split_dataspec(path_name) == (nothing, nothing, nothing)
+            end
+            let path_name = "$(name)/foo"
+                @test_throws ErrorException DataSets.check_dataset_name(path_name) === nothing
+                @test DataSets._split_dataspec(path_name) == (nothing, nothing, nothing)
+            end
+            let path_name = "foo/$(name)/bar"
+                @test_throws ErrorException DataSets.check_dataset_name(path_name) === nothing
+                @test DataSets._split_dataspec(path_name) == (nothing, nothing, nothing)
+            end
+        end
+    end
+end
+
+@testset "URL-like dataspec parsing" begin
+    # Valid dataspecs
+    DataSets._split_dataspec("foo?x=1#f") == ("foo", ["x" => "1"], "f")
+    DataSets._split_dataspec("foo#f") == ("foo", nothing, "f")
+    DataSets._split_dataspec("foo?x=1") == ("foo", ["x" => "1"], nothing)
+    DataSets._split_dataspec("foo?x=1") == ("foo", ["x" => "1"], nothing)
+    # Invalid dataspecs
+    DataSets._split_dataspec("foo ?x=1") == (nothing, nothing, nothing)
+    DataSets._split_dataspec("foo\n?x=1") == (nothing, nothing, nothing)
+    DataSets._split_dataspec("foo\nbar?x=1") == (nothing, nothing, nothing)
+    DataSets._split_dataspec(" foo?x=1") == (nothing, nothing, nothing)
+    DataSets._split_dataspec("1?x=1") == (nothing, nothing, nothing)
+    DataSets._split_dataspec("foo-?x=1") == (nothing, nothing, nothing)
+    DataSets._split_dataspec("foo #f") == (nothing, nothing, nothing)
+    DataSets._split_dataspec("@?x=1") == (nothing, nothing, nothing)
+
+    proj = DataSets.load_project("Data.toml")
+
+    @test !haskey(dataset(proj, "a_text_file"), "dataspec")
+
+    # URL-like query
+    @test dataset(proj, "a_text_file?x=1&yy=2")["dataspec"]["query"] == Dict("x"=>"1", "yy"=>"2")
+    @test dataset(proj, "a_text_file?y%20y=x%20x")["dataspec"]["query"] == Dict("y y"=>"x x")
+    @test dataset(proj, "a_text_file?x=%3d&y=%26")["dataspec"]["query"] == Dict("x"=>"=", "y"=>"&")
+
+    # URL-like fragment
+    @test dataset(proj, "a_text_file#a/b")["dataspec"]["fragment"] == "a/b"
+    @test dataset(proj, "a_text_file#x%20x")["dataspec"]["fragment"] == "x x"
+    @test dataset(proj, "a_text_file#x%ce%b1x")["dataspec"]["fragment"] == "xαx"
+
+    # Combined query and fragment
+    @test dataset(proj, "a_text_file?x=1&yy=2#frag")["dataspec"]["query"] == Dict("x"=>"1", "yy"=>"2")
+    @test dataset(proj, "a_text_file?x=1&yy=2#frag")["dataspec"]["fragment"] == "frag"
+end
+
+#-------------------------------------------------------------------------------
+# Trees
+@testset "Temporary trees" begin
+    function write_dir(j)
+        d = newdir()
+        for i=1:2
+            d["hi_$i.txt"] = newfile() do io
+                println(io, "hi $j $i")
+            end
+        end
+        return d
+    end
+
+    temptree = newdir()
+    for j=1:3
+        temptree["d$j"] = write_dir(j)
+    end
+    @test open(io->read(io,String), IO, temptree["d1"]["hi_2.txt"]) == "hi 1 2\n"
+    @test open(io->read(io,String), IO, temptree["d3"]["hi_1.txt"]) == "hi 3 1\n"
+    @test isfile(DataSets.sys_abspath(temptree["d1"]["hi_2.txt"]))
+end
+
+include("projects.jl")
+include("entrypoint.jl")
+include("repl.jl")
+include("DataTomlStorage.jl")
+include("backend_compat.jl")
+include("driver_autoload.jl")
