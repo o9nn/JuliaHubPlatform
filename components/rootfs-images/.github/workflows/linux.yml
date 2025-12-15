@@ -1,0 +1,102 @@
+name: Linux
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  release:
+    types: [published]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  # Skip intermediate builds: all builds except for builds on the `main` branch
+  # Cancel intermediate builds: only pull request builds
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+jobs:
+  linux:
+    timeout-minutes: 10
+    name: linux
+    needs: build_linux
+    runs-on: ubuntu-latest
+    steps:
+      - run: true
+  build_linux:
+    timeout-minutes: 120
+    name: build_linux / ${{ matrix.image }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          # Build a bunch of different "agent" rootfs images.
+          - 'agent_linux.x86_64'
+
+          # The `debian_minimal` image is a `debian`-based image that
+          # contains no packages.
+          - 'debian_minimal.x86_64'
+
+          # The `aws_uploader` image is a `debian`-based image that
+          # contains just `awscli`, for usage in secured pipelines
+          # that need to upload to AWS.
+          - 'aws_uploader.x86_64'
+
+          # A Debian-based image used to build linux kernels and modules
+          - 'kernel_builder.x86_64'
+
+          # A Debian-based image used to build litex designs and firmware
+          # Because this requires the vivado toolchain (and it's huge) we won't
+          # actually build it on GHA
+          #- 'litex_builder.x86_64'
+
+          # The `rr` image is `debian`-based.
+          # It is used for building rr from source and running the rr test suite.
+          - 'rr.aarch64'
+          - 'rr.x86_64'
+
+          # The `npm_linux` image is a helper for ecosystem jobs that need to build NPM packages
+          - 'npm_linux.x86_64'
+
+          # The `python_latex_kitchen_sink` image is a helper for ecosystem jobs, such as SciMLBenchmarks
+          # that require a large number of tools.  We're kind of throwing everything (including, yes, the
+          # proverbial  kitchen sink) in here, in the hope that we'll be able to re-use this image across
+          # many similar jobs.  If you're using this image, you're throwing in the towel on providing a
+          # small, lean environment, but that's probably necessary.
+          - 'python_latex_kitchen_sink.x86_64'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.6'
+          arch: x64
+      - run: |
+          import Pkg
+          ENV["JULIA_PKG_SERVER"] = ""
+          Pkg.Registry.add("General")
+        shell: julia --color=yes {0}
+      - run: sudo apt-get update
+      - run: sudo apt-get -y install binfmt-support debootstrap qemu-user-static
+      - run: update-binfmts --display
+      - run: julia --color=yes --project=. -e 'import Pkg; @time Pkg.instantiate()'
+      - run: julia --color=yes --project=. -e 'import Pkg; @time Pkg.precompile()'
+      - run: julia --color=yes --project=. -e '@time import RootfsUtils'
+      - run: |
+          IMAGE_NAME=$(echo ${{ matrix.image }} | cut -d. -f1)
+          IMAGE_ARCH=$(echo ${{ matrix.image }} | cut -d. -f2)
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          echo "IMAGE_ARCH=$IMAGE_ARCH" >> $GITHUB_ENV
+      - run: julia --color=yes --project=. linux/${{ env.IMAGE_NAME }}.jl --arch=${{ env.IMAGE_ARCH }}
+        id: build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "The tarball name is ${{ steps.build.outputs.tarball_name }}"
+      - run: echo "The tarball path is ${{ steps.build.outputs.tarball_path }}"
+      - uses: actions/upload-artifact@v2
+        if: steps.build.outputs.tarball_name != '' && steps.build.outputs.tarball_path != ''
+        with:
+          name: ${{ steps.build.outputs.tarball_name }}
+          path: ${{ steps.build.outputs.tarball_path }}
+          if-no-files-found: error

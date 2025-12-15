@@ -1,0 +1,65 @@
+---
+title: Iris Data Analysis
+author: Julia Computing
+date: >
+    `j "Report generated as of: <br> $(WEAVE_ARGS.date)"`
+---
+
+## Package initialization
+
+```julia; results = "hidden"
+using WeaveReportsTutorial
+using CSV
+using DataFrames
+using CairoMakie
+using PrettyTables
+using StatsBase: mean
+```
+
+## Parameters
+
+```julia; echo = false
+params = Dict(
+    "X axis" => WEAVE_ARGS.xaxis,
+    "Y axis" => WEAVE_ARGS.yaxis)
+
+pretty_table(HTML, params, noheader = true, tf = tf_html_minimalist)
+```
+
+## Load data
+
+```julia; results = "hidden"
+tmp = tempname()
+download("https://jeremiedb.s3.ca-central-1.amazonaws.com/share/datasets.jl/iris.csv", tmp)
+iris_df = CSV.read(tmp, DataFrame)
+```
+
+## Summary stats
+
+```julia; results = "hidden"
+gdf = groupby(iris_df, :variety)
+vars = ["sepal.length", "sepal.width", "petal.length", "petal.width"]
+stats_df = combine(gdf, vars .=> mean .=> vars)
+```
+
+```julia; echo = false; results = "markup"
+pretty_table(HTML, stats_df, nosubheader = true, alignment = :c, tf = tf_html_minimalist)
+```
+
+## Plots
+
+```julia
+fig = Figure()
+f1 = fig[1,1]
+f2 = fig[2,1]
+ax1 = Axis(f1, xlabel = WEAVE_ARGS.xaxis, ylabel = WEAVE_ARGS.yaxis)
+
+iris_gdf = groupby(iris_df, :variety)
+
+for (key, val) in iris_gdf.keymap
+    scatter!(f1, iris_gdf[val][!, WEAVE_ARGS.xaxis], iris_gdf[val][!, WEAVE_ARGS.yaxis], label = key[1])
+end
+
+Legend(f2, ax1, orientation = :horizontal)
+current_figure()
+```

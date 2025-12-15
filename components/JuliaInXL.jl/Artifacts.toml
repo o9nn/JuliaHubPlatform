@@ -1,0 +1,7 @@
+[JuliaInXL]
+git-tree-sha1 = "2bfcb28ce22d19b8c73462c6bf769fc875db97e6"
+os = "windows"
+
+    [[JuliaInXL.download]]
+    url = "https://github.com/JuliaComputing/JuliaInXL.jl/releases/download/v0.0.2/juliainxl.tar.gz"
+    sha256 = "a533e60a97491515bbda4f881246d00a5af2da2f277bd7d3a29b6ad10768b435"
