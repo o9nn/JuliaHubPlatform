@@ -1,17 +1,17 @@
 #!/usr/bin/env julia
-"""
-Improved script to clone repositories in batches from repos.tsv
-with better git handling to avoid SIGTERM issues during large commits.
 
-Usage: julia clone_batch_improved.jl <batch_number> [batch_size]
-Example: julia clone_batch_improved.jl 1 20
+# Improved script to clone repositories in batches from repos.tsv
+# with better git handling to avoid SIGTERM issues during large commits.
+#
+# Usage: julia clone_batch_improved.jl <batch_number> [batch_size]
+# Example: julia clone_batch_improved.jl 1 20
+#
+# Key improvements:
+# 1. Uses git add with batching to avoid overwhelming git
+# 2. Commits after each batch of files to prevent timeout
+# 3. Better error handling and progress reporting
+# 4. Configures git to handle large repos better
 
-Key improvements:
-1. Uses git add with batching to avoid overwhelming git
-2. Commits after each batch of files to prevent timeout
-3. Better error handling and progress reporting
-4. Configures git to handle large repos better
-"""
 using DelimitedFiles
 
 function configure_git()
@@ -28,7 +28,7 @@ function configure_git()
 end
 
 function stage_files_in_batches(dir::String, batch_size::Int=500)
-    """Stage files in smaller batches to avoid git add timeout"""
+    # Stage files in smaller batches to avoid git add timeout
     # Get all untracked and modified files
     files_output = read(`git status --porcelain`, String)
     files = filter(!isempty, split(files_output, '\n'))
@@ -70,7 +70,7 @@ function stage_files_in_batches(dir::String, batch_size::Int=500)
 end
 
 function commit_component(name::String)
-    """Commit a single component immediately after cloning"""
+    # Commit a single component immediately after cloning
     try
         # Stage only the specific component directory
         component_path = joinpath("components", name)
