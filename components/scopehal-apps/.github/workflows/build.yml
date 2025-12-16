@@ -1,0 +1,183 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * 5'
+  workflow_dispatch:
+
+jobs:
+
+
+  Tarball:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Make Source Tarball
+      run: |
+        cd ..
+        tar -cf source.tar scopehal-apps
+        gzip -S .gz -9 source.tar
+        mv source.tar.gz scopehal-apps/
+
+    - name: Upload Source
+      uses: actions/upload-artifact@v2
+      with:
+        name: glscopeclient-source
+        path: source.tar.gz
+
+
+  Linux:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install \
+          build-essential \
+          cmake \
+          pkg-config \
+          libglm-dev \
+          libgtkmm-3.0-dev \
+          libsigc++-2.0-dev \
+          libyaml-cpp-dev \
+          liblxi-dev \
+          texlive \
+          texlive-fonts-extra \
+          libglew-dev
+
+    - name: Clone and Build FFTS Library
+      run: |
+        git clone https://github.com/anthonix/ffts.git /tmp/ffts
+        pushd /tmp/ffts
+        mkdir build
+        cd build
+        cmake \
+          -DENABLE_SHARED=ON \
+          ..
+        make -j4
+        sudo make install
+        popd
+
+    - name: Clone and Build Catch2 Library
+      run: |
+        git clone https://github.com/catchorg/Catch2 /tmp/catch2
+        pushd /tmp/catch2
+        git checkout v2.13.2
+        mkdir build
+        cd build
+        cmake ..
+        make -j 4
+        sudo make install
+        popd
+
+    - name: Build
+      run: |
+        mkdir build
+        cd build
+        cmake \
+          -DCMAKE_BUILD_TYPE=DEBUG \
+          -DBUILD_DOCS=ON \
+          ..
+        make -j4
+
+    - name: Run Tests
+      run: |
+        cd build
+        make test
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: glscopeclient-linux
+        path: |
+          build/src/glscopeclient/glscopeclient
+          build/src/glscopeclient/gradients/*
+          build/src/glscopeclient/shaders/*
+          build/src/glscopeclient/styles/*
+          build/lib/graphwidget/libgraphwidget.so
+          build/lib/scopehal/libscopehal.so
+          build/lib/scopeprotocols/libscopeprotocols.so
+
+    - name: Upload Documentation
+      uses: actions/upload-artifact@v2
+      with:
+        name: glscopeclient-manual
+        path: build/doc/glscopeclient-manual.pdf
+
+
+  Windows:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+
+    - run: git config --global core.autocrlf input
+      shell: bash
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        msystem: MINGW64
+        install: |
+          git
+          mingw-w64-x86_64-toolchain
+
+    - name: Build
+      run: |
+        cd msys2
+        MINGW_ARCH=mingw64 makepkg-mingw --noconfirm --noprogressbar -sCLf
+
+    - name: Test
+      run: |
+        pacman -U --noconfirm msys2/*.zst
+        glscopeclient --help
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: glscopeclient-windows
+        path: msys2/*.zst
+
+    - name: Build MSI / portable zip
+      run: |
+        mkdir build_msi
+        cd build_msi
+        cmake \
+          -G"Ninja" \
+          -DBUILD_TESTING=OFF \
+          -DWIXPATH="/c/Program Files (x86)/WiX Toolset v3.11/bin" \
+          ../
+        cmake --build ./
+
+    - name: Upload Artifacts (portable zip)
+      uses: actions/upload-artifact@v2
+      with:
+        name: glscopeclient-windows-portable
+        path: build_msi/dist/windows_x64
+
+    - name: Upload Artifacts (MSI)
+      uses: actions/upload-artifact@v2
+      with:
+        name: glscopeclient-windows.msi
+        path: build_msi/dist/*.msi

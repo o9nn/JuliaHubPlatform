@@ -1,0 +1,26 @@
+stages:
+  - setup
+  - rebuild
+
+setup:
+  stage: setup
+  only:
+    - triggers
+  image: python:alpine
+  script: |
+    wget https://raw.githubusercontent.com/SciML/RebuildAction/master/pipeline.py
+    pip install pyyaml
+    python pipeline.py > rebuild.yml
+  artifacts:
+    paths:
+      - rebuild.yml
+
+rebuild:
+  stage: rebuild
+  only:
+    - triggers
+  trigger:
+    include:
+      - artifact: rebuild.yml
+        job: setup
+    strategy: depend
