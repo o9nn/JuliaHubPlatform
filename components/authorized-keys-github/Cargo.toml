@@ -1,0 +1,13 @@
+[package]
+name = "authorized-keys-github"
+version = "0.1.0"
+authors = ["Keno Fischer <keno@juliahub.com>", "Elliot Saba <elliot.saba@juliahub.com>"]
+edition = "2018"
+
+[dependencies]
+clap = "2.33.0"
+sshkeys = "0.3.2"
+users = "0.9.1"
+tempfile = "3.1.0"
+reqwest = {version = "0.10.4", default-features = false, features=["rustls-tls-native-roots"]}
+tokio = {version = "0.2.13", features=["rt-threaded", "macros"]}

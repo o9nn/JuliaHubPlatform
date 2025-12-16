@@ -1,0 +1,9 @@
+/Manifest.toml
+*.js
+*.css
+*.js.map
+*.log
+*.Manifest.toml
+docs/build
+*ipynb*
+*.DS_Store

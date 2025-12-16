@@ -1,0 +1,33 @@
+name = "DynamicModelTestUtils"
+uuid = "726cd793-0c59-4a7a-97d2-1baad301d093"
+authors = ["Ben Chung <benjamin.chung@juliahub.com> and contributors"]
+version = "0.1.2"
+
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Git = "d7ba0133-e1db-5d97-8f8c-041e4b3a1eb2"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+SymbolicIndexingInterface = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+CSV = "^0.10"
+DataFrames = "^1.6"
+Git = "1"
+ModelingToolkit = "8,9"
+SciMLBase = "^2.31"
+StatsBase = "^0.34"
+SymbolicIndexingInterface = "^0.3.15"
+julia = "1.10"
+
+[extras]
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+ModelingToolkitStandardLibrary = "16a59e39-deab-5bd0-87e4-056b12336739"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "ModelingToolkitStandardLibrary", "DifferentialEquations"]

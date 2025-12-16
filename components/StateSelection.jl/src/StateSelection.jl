@@ -1,0 +1,35 @@
+module StateSelection
+
+using DocStringExtensions
+using Setfield: @set!, @set
+using Graphs
+import SparseArrays
+import OrderedCollections: OrderedSet
+
+# Graph Types
+using BipartiteGraphs
+include("graph/diff.jl")
+
+# Math library
+include("math/bareiss.jl")
+include("math/sparsematrixclil.jl")
+using .CLIL, .bareiss
+
+# Downstream interferace
+include("interface.jl")
+
+# Structural transformation passes
+include("singularity_removal.jl")
+include("pantelides.jl")
+include("tearing.jl")
+include("modia_tearing.jl")
+include("partial_state_selection.jl")
+
+# Utilities
+include("debug.jl")
+include("utils.jl")
+
+export DiffGraph, bareiss, CLIL, find_eq_solvables!, SelectedState
+export TearingAlgorithm, TearingResult, ModiaTearing, DummyDerivativeTearing
+
+end

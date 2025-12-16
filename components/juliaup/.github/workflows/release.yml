@@ -1,0 +1,1232 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions: write-all
+      
+jobs:
+
+  build-juliaup:
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        label: [
+          x86_64-pc-windows-msvc-windowsstore,
+          x86_64-pc-windows-msvc-windowsappinstaller,
+          x86_64-pc-windows-gnu-msi,
+          x86_64-pc-windows-gnu-portable,
+          x86_64-apple-darwin,
+          x86_64-apple-darwin-portable,
+          x86_64-unknown-linux-gnu,
+          x86_64-unknown-linux-musl,
+          x86_64-unknown-linux-musl-portable,
+          x86_64-unknown-freebsd,
+          i686-pc-windows-msvc-windowsstore,
+          i686-pc-windows-msvc-windowsappinstaller,
+          i686-pc-windows-gnu-msi,
+          i686-pc-windows-gnu-portable,
+          i686-unknown-linux-gnu,
+          i686-unknown-linux-musl,
+          i686-unknown-linux-musl-portable,
+          aarch64-unknown-linux-gnu,
+          aarch64-unknown-linux-musl,
+          aarch64-unknown-linux-musl-portable,
+          aarch64-apple-darwin,
+          aarch64-apple-darwin-portable
+          ]
+        include:
+          - label: x86_64-pc-windows-msvc-windowsstore
+            target: x86_64-pc-windows-msvc
+            bins: --bin juliaup --bin julialauncher
+            os: windows
+            features: windowsstore,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: x86_64-pc-windows-msvc-windowsappinstaller
+            target: x86_64-pc-windows-msvc
+            bins: --bin juliaup --bin julialauncher
+            os: windows
+            features: windowsappinstaller,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: x86_64-pc-windows-gnu-msi
+            target: x86_64-pc-windows-gnu
+            bins: --bin juliaup --bin julialauncher
+            os: windows
+            features: binjulialauncher
+            rustflags:
+            toolchain: stable-gnu
+          - label: x86_64-pc-windows-gnu-portable
+            target: x86_64-pc-windows-gnu
+            bins: --bin juliaup --bin julia
+            os: windows
+            features: dummy
+            rustflags:
+            toolchain: stable-gnu
+          - label: i686-pc-windows-gnu-msi
+            target: i686-pc-windows-gnu
+            bins: --bin juliaup --bin julialauncher
+            os: windows
+            features: binjulialauncher
+            rustflags:
+            toolchain: stable-i686-gnu
+          - label: i686-pc-windows-gnu-portable
+            target: i686-pc-windows-gnu
+            bins: --bin juliaup --bin julia
+            os: windows
+            features: dummy
+            rustflags:
+            toolchain: stable-i686-gnu
+          - label: x86_64-apple-darwin
+            target: x86_64-apple-darwin
+            bins: --bin juliaup --bin julialauncher --bin juliainstaller
+            os: macos
+            features: selfupdate,binjuliainstaller,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: x86_64-apple-darwin-portable
+            target: x86_64-apple-darwin
+            bins: --bin juliaup --bin julia
+            os: macos
+            features: dummy
+            rustflags:
+            toolchain: stable
+          - label: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-gnu
+            bins: --bin juliaup --bin julialauncher --bin juliainstaller
+            os: ubuntu
+            features: selfupdate,binjuliainstaller,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: x86_64-unknown-linux-musl
+            target: x86_64-unknown-linux-musl
+            bins: --bin juliaup --bin julialauncher --bin juliainstaller
+            os: ubuntu
+            features: selfupdate,binjuliainstaller,binjulialauncher
+            rustflags: -C target-feature=+crt-static
+            toolchain: stable
+          - label: x86_64-unknown-linux-musl-portable
+            target: x86_64-unknown-linux-musl
+            bins: --bin juliaup --bin julia
+            os: ubuntu
+            features: dummy
+            rustflags: -C target-feature=+crt-static
+            toolchain: stable
+          - label: x86_64-unknown-freebsd
+            target: x86_64-unknown-freebsd
+            bins: --bin juliaup --bin julialauncher --bin juliainstaller
+            os: ubuntu
+            features: selfupdate,binjuliainstaller,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: i686-pc-windows-msvc-windowsstore
+            target: i686-pc-windows-msvc
+            bins: --bin juliaup --bin julialauncher
+            os: windows
+            features: windowsstore,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: i686-pc-windows-msvc-windowsappinstaller
+            target: i686-pc-windows-msvc
+            bins: --bin juliaup --bin julialauncher
+            os: windows
+            features: windowsappinstaller,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: i686-unknown-linux-gnu
+            target: i686-unknown-linux-gnu
+            bins: --bin juliaup --bin julialauncher --bin juliainstaller
+            os: ubuntu
+            features: selfupdate,binjuliainstaller,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: i686-unknown-linux-musl
+            target: i686-unknown-linux-musl
+            bins: --bin juliaup --bin julialauncher --bin juliainstaller
+            os: ubuntu
+            features: selfupdate,binjuliainstaller,binjulialauncher
+            rustflags: -C target-feature=+crt-static
+            toolchain: stable
+          - label: i686-unknown-linux-musl-portable
+            target: i686-unknown-linux-musl
+            bins: --bin juliaup --bin julia
+            os: ubuntu
+            features: dummy
+            rustflags: -C target-feature=+crt-static
+            toolchain: stable
+          - label: aarch64-unknown-linux-gnu
+            target: aarch64-unknown-linux-gnu
+            bins: --bin juliaup --bin julialauncher --bin juliainstaller
+            os: ubuntu
+            features: selfupdate,binjuliainstaller,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: aarch64-unknown-linux-musl
+            target: aarch64-unknown-linux-musl
+            bins: --bin juliaup --bin julialauncher --bin juliainstaller
+            os: ubuntu
+            features: selfupdate,binjuliainstaller,binjulialauncher
+            rustflags: -C target-feature=+crt-static
+            toolchain: stable
+          - label: aarch64-unknown-linux-musl-portable
+            target: aarch64-unknown-linux-musl
+            bins: --bin juliaup --bin julia
+            os: ubuntu
+            features: dummy
+            rustflags: -C target-feature=+crt-static
+            toolchain: stable
+          - label: aarch64-apple-darwin
+            target: aarch64-apple-darwin
+            bins: --bin juliaup --bin julialauncher --bin juliainstaller
+            os: macos
+            features: selfupdate,binjuliainstaller,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - label: aarch64-apple-darwin-portable
+            target: aarch64-apple-darwin
+            bins: --bin juliaup --bin julia
+            os: macos
+            features: dummy
+            rustflags:
+            toolchain: stable
+    steps:
+    - uses: actions/checkout@v5
+    - if: ${{ contains(matrix.target, '-musl') }}
+      run: sudo apt-get install musl-tools
+    - uses: egor-tensin/setup-mingw@v2
+      if: ${{ contains(matrix.toolchain, 'stable-i686-gnu') }}
+      with:
+        platform: x86
+        version: 12.2.0
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+      if: ${{ ! contains(matrix.target, 'freebsd') }}
+      with:
+        toolchain: ${{matrix.toolchain}}
+        target: ${{matrix.target}}
+    - name: Release build
+      if: ${{ ! contains(matrix.target, 'freebsd') }}
+      uses: clechasseur/rs-cargo@v3
+      with:
+        command: build
+        tool: ${{ matrix.os == 'ubuntu' && 'cross' || 'cargo' }}
+        args: --release ${{matrix.bins}} --target ${{matrix.target}} --features ${{matrix.features}}
+      env:
+        CARGO_TARGET_x86_64-unknown-linux-musl: ${{matrix.rustflags}}
+        CARGO_TARGET_i686-unknown-linux-musl: ${{matrix.rustflags}}
+        CARGO_TARGET_aarch64-unknown-linux-musl: ${{matrix.rustflags}}
+    - name: FreeBSD release build
+      if: ${{ contains(matrix.target, 'freebsd') }}
+      uses: cross-platform-actions/action@v0.30.0
+      with:
+        operating_system: freebsd
+        version: '13.4'
+        architecture: x86-64
+        cpu_count: 4
+        memory: '12G'
+        shell: sh
+        run: |
+          fetch https://sh.rustup.rs -o - | sh -s -- -y --default-toolchain ${{matrix.toolchain}}
+          . "${HOME}/.cargo/env"
+          cargo build --release ${{matrix.bins}} --target ${{matrix.target}} --features ${{matrix.features}}
+    - uses: actions/upload-artifact@v5
+      with:
+        name: juliaup-${{matrix.label}}
+        path: |
+          target/${{matrix.target}}/release/juliaup
+          target/${{matrix.target}}/release/julialauncher
+          target/${{matrix.target}}/release/julia
+          target/${{matrix.target}}/release/juliaup.exe
+          target/${{matrix.target}}/release/julialauncher.exe
+          target/${{matrix.target}}/release/julia.exe
+    - uses: actions/upload-artifact@v5
+      if: ${{ contains(matrix.bins, 'juliainstaller') }}
+      with:
+        name: juliainstaller-${{matrix.label}}
+        path: |
+          target/${{matrix.target}}/release/juliainstaller
+          target/${{matrix.target}}/release/juliainstaller.exe
+
+  test-juliaup:
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        target: [
+          x86_64-pc-windows-msvc,
+          x86_64-apple-darwin,
+          x86_64-unknown-linux-gnu,
+          x86_64-unknown-linux-musl,
+          x86_64-unknown-freebsd,
+          i686-pc-windows-msvc,
+          ]
+        include:
+          - target: x86_64-pc-windows-msvc
+            os: windows
+            features: dummy,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - target: x86_64-pc-windows-gnu
+            os: windows
+            features: dummy,binjulialauncher
+            rustflags:
+            toolchain: stable-gnu
+          - target: x86_64-apple-darwin
+            os: macos
+            features: dummy,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu
+            features: dummy,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu
+            features: dummy,binjulialauncher
+            rustflags: -C target-feature=+crt-static
+            toolchain: stable
+          - target: x86_64-unknown-freebsd
+            os: ubuntu
+            features: dummy,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - target: i686-pc-windows-msvc
+            os: windows
+            features: dummy,binjulialauncher
+            rustflags:
+            toolchain: stable
+          - target: i686-pc-windows-gnu
+            os: windows
+            features: dummy,binjulialauncher
+            rustflags:
+            toolchain: stable-i686-gnu
+    steps:
+    - uses: actions/checkout@v5
+    - if: ${{ contains(matrix.target, '-musl') }}
+      run: sudo apt-get install musl-tools
+    - uses: egor-tensin/setup-mingw@v2
+      if: ${{ contains(matrix.toolchain, 'stable-i686-gnu') }}
+      with:
+        platform: x86
+        version: 12.2.0
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+      if: ${{ ! contains(matrix.target, 'freebsd') }}
+      with:
+        toolchain: ${{matrix.toolchain}}
+        target: ${{matrix.target}}
+    - name: Test
+      if: ${{ ! contains(matrix.target, 'freebsd') }}
+      uses: clechasseur/rs-cargo@v3
+      with:
+        command: test
+        tool: ${{ matrix.os == 'ubuntu' && 'cross' || 'cargo' }}
+        args: --target ${{matrix.target}} --features ${{matrix.features}}
+      env:
+        CARGO_TARGET_x86_64-unknown-linux-musl: ${{matrix.rustflags}}
+        CARGO_TARGET_i686-unknown-linux-musl: ${{matrix.rustflags}}
+        CARGO_TARGET_aarch64-unknown-linux-musl: ${{matrix.rustflags}}
+    - name: Test FreeBSD
+      if: ${{ contains(matrix.target, 'freebsd') }}
+      uses: cross-platform-actions/action@v0.30.0
+      with:
+        operating_system: freebsd
+        version: '13.4'
+        architecture: x86-64
+        cpu_count: 4
+        memory: '12G'
+        shell: sh
+        run: |
+          fetch https://sh.rustup.rs -o - | sh -s -- -y --default-toolchain ${{matrix.toolchain}}
+          . "${HOME}/.cargo/env"
+          cargo test --target ${{matrix.target}} --features ${{matrix.features}}
+  package-unix:
+    needs: [build-juliaup,test-juliaup]
+    environment: package
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Download Linux x64 juliaup artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-unknown-linux-gnu
+        path: target/x86_64-unknown-linux-gnu
+    - name: Download Linux x64 musl juliaup artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-unknown-linux-musl
+        path: target/x86_64-unknown-linux-musl
+    - name: Download Linux x86 juliaup artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-i686-unknown-linux-gnu
+        path: target/i686-unknown-linux-gnu
+    - name: Download Linux x86 musl juliaup artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-i686-unknown-linux-musl
+        path: target/i686-unknown-linux-musl
+    - name: Download MacOS x64 juliaup artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-apple-darwin
+        path: target/x86_64-apple-darwin
+    - name: Download MacOS aarch64 juliaup artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-aarch64-apple-darwin
+        path: target/aarch64-apple-darwin
+    - name: Download Linux aarch64 juliaup artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-aarch64-unknown-linux-gnu
+        path: target/aarch64-unknown-linux-gnu
+    - name: Download Linux aarch64 musl juliaup artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-aarch64-unknown-linux-musl
+        path: target/aarch64-unknown-linux-musl
+    - name: Download FreeBSD x64 juliaup artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-unknown-freebsd
+        path: target/x86_64-unknown-freebsd
+    - name: Download installer artifacts for x86_64-apple-darwin
+      uses: actions/download-artifact@v6
+      with:
+        name: juliainstaller-x86_64-apple-darwin
+        path: target/installer/x86_64-apple-darwin
+    - name: Download installer artifacts for x86_64-unknown-linux-gnu
+      uses: actions/download-artifact@v6
+      with:
+        name: juliainstaller-x86_64-unknown-linux-gnu
+        path: target/installer/x86_64-unknown-linux-gnu
+    - name: Download installer artifacts for x86_64-unknown-linux-musl
+      uses: actions/download-artifact@v6
+      with:
+        name: juliainstaller-x86_64-unknown-linux-musl
+        path: target/installer/x86_64-unknown-linux-musl
+    - name: Download installer artifacts for i686-unknown-linux-gnu
+      uses: actions/download-artifact@v6
+      with:
+        name: juliainstaller-i686-unknown-linux-gnu
+        path: target/installer/i686-unknown-linux-gnu
+    - name: Download installer artifacts for i686-unknown-linux-musl
+      uses: actions/download-artifact@v6
+      with:
+        name: juliainstaller-i686-unknown-linux-musl
+        path: target/installer/i686-unknown-linux-musl
+    - name: Download installer artifacts for aarch64-unknown-linux-gnu
+      uses: actions/download-artifact@v6
+      with:
+        name: juliainstaller-aarch64-unknown-linux-gnu
+        path: target/installer/aarch64-unknown-linux-gnu
+    - name: Download installer artifacts for aarch64-unknown-linux-musl
+      uses: actions/download-artifact@v6
+      with:
+        name: juliainstaller-aarch64-unknown-linux-musl
+        path: target/installer/aarch64-unknown-linux-musl
+    - name: Download installer artifacts for aarch64-apple-darwin
+      uses: actions/download-artifact@v6
+      with:
+        name: juliainstaller-aarch64-apple-darwin
+        path: target/installer/aarch64-apple-darwin
+    - name: Download installer artifacts for x86_64-unknown-freebsd
+      uses: actions/download-artifact@v6
+      with:
+        name: juliainstaller-x86_64-unknown-freebsd
+        path: target/installer/x86_64-unknown-freebsd
+    - name: Set permissions
+      run: |
+        chmod a+rx target/x86_64-unknown-linux-gnu/juliaup
+        chmod a+rx target/x86_64-unknown-linux-gnu/julialauncher
+        chmod a+rx target/x86_64-unknown-linux-musl/juliaup
+        chmod a+rx target/x86_64-unknown-linux-musl/julialauncher
+        chmod a+rx target/i686-unknown-linux-gnu/juliaup
+        chmod a+rx target/i686-unknown-linux-gnu/julialauncher
+        chmod a+rx target/i686-unknown-linux-musl/juliaup
+        chmod a+rx target/i686-unknown-linux-musl/julialauncher
+        chmod a+rx target/x86_64-apple-darwin/juliaup
+        chmod a+rx target/x86_64-apple-darwin/julialauncher
+        chmod a+rx target/aarch64-apple-darwin/juliaup
+        chmod a+rx target/aarch64-apple-darwin/julialauncher
+        chmod a+rx target/aarch64-unknown-linux-gnu/juliaup
+        chmod a+rx target/aarch64-unknown-linux-gnu/julialauncher
+        chmod a+rx target/aarch64-unknown-linux-musl/juliaup
+        chmod a+rx target/aarch64-unknown-linux-musl/julialauncher
+        chmod a+rx target/x86_64-unknown-freebsd/juliaup
+        chmod a+rx target/x86_64-unknown-freebsd/julialauncher
+    - name: Export version
+      run: |
+        export VERSION=$(echo $GH_REF | sed 's:refs/tags/v::')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+      env:
+          GH_REF: ${{ github.ref }}
+    - name: Create archives
+      run: |
+        mkdir public
+        mkdir public/bin
+
+        cd target/x86_64-unknown-linux-gnu
+        tar -czvf ../../public/bin/juliaup-${{ env.VERSION }}-x86_64-unknown-linux-gnu.tar.gz .
+
+        cd ../../target/x86_64-unknown-linux-musl
+        tar -czvf ../../public/bin/juliaup-${{ env.VERSION }}-x86_64-unknown-linux-musl.tar.gz .
+
+        cd ../../target/i686-unknown-linux-gnu
+        tar -czvf ../../public/bin/juliaup-${{ env.VERSION }}-i686-unknown-linux-gnu.tar.gz .
+
+        cd ../../target/i686-unknown-linux-musl
+        tar -czvf ../../public/bin/juliaup-${{ env.VERSION }}-i686-unknown-linux-musl.tar.gz .
+
+        cd ../../target/x86_64-apple-darwin
+        tar -czvf ../../public/bin/juliaup-${{ env.VERSION }}-x86_64-apple-darwin.tar.gz .
+
+        cd ../../target/aarch64-apple-darwin
+        tar -czvf ../../public/bin/juliaup-${{ env.VERSION }}-aarch64-apple-darwin.tar.gz .
+
+        cd ../../target/aarch64-unknown-linux-gnu
+        tar -czvf ../../public/bin/juliaup-${{ env.VERSION }}-aarch64-unknown-linux-gnu.tar.gz .
+
+        cd ../../target/aarch64-unknown-linux-musl
+        tar -czvf ../../public/bin/juliaup-${{ env.VERSION }}-aarch64-unknown-linux-musl.tar.gz .
+
+        cd ../../target/x86_64-unknown-freebsd
+        tar -czvf ../../public/bin/juliaup-${{ env.VERSION }}-x86_64-unknown-freebsd.tar.gz .
+
+        cd ../..
+    - name: Rename and move juliainstaller
+      run: |
+        mv target/installer/x86_64-apple-darwin/juliainstaller public/bin/juliainstaller-${{ env.VERSION }}-x86_64-apple-darwin
+        mv target/installer/x86_64-unknown-linux-gnu/juliainstaller public/bin/juliainstaller-${{ env.VERSION }}-x86_64-unknown-linux-gnu
+        mv target/installer/x86_64-unknown-linux-musl/juliainstaller public/bin/juliainstaller-${{ env.VERSION }}-x86_64-unknown-linux-musl
+        mv target/installer/x86_64-unknown-freebsd/juliainstaller public/bin/juliainstaller-${{ env.VERSION }}-x86_64-unknown-freebsd
+        mv target/installer/i686-unknown-linux-gnu/juliainstaller public/bin/juliainstaller-${{ env.VERSION }}-i686-unknown-linux-gnu
+        mv target/installer/i686-unknown-linux-musl/juliainstaller public/bin/juliainstaller-${{ env.VERSION }}-i686-unknown-linux-musl
+        mv target/installer/aarch64-unknown-linux-gnu/juliainstaller public/bin/juliainstaller-${{ env.VERSION }}-aarch64-unknown-linux-gnu
+        mv target/installer/aarch64-unknown-linux-musl/juliainstaller public/bin/juliainstaller-${{ env.VERSION }}-aarch64-unknown-linux-musl
+        mv target/installer/aarch64-apple-darwin/juliainstaller public/bin/juliainstaller-${{ env.VERSION }}-aarch64-apple-darwin
+    - name: Upload to S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --cache-control public,max-age=2678400 --metadata-directive REPLACE
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        SOURCE_DIR: 'public'
+
+  package-unix-portable:
+    needs: [build-juliaup,test-juliaup]
+    environment: package
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Download x86_64-apple-darwin-portable artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-apple-darwin-portable
+        path: target/x86_64-apple-darwin-portable
+    - name: Download x86_64-unknown-linux-musl-portable artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-unknown-linux-musl-portable
+        path: target/x86_64-unknown-linux-musl-portable
+    - name: Download i686-unknown-linux-musl-portable artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-i686-unknown-linux-musl-portable
+        path: target/i686-unknown-linux-musl-portable
+    - name: Download aarch64-unknown-linux-musl-portable artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-aarch64-unknown-linux-musl-portable
+        path: target/aarch64-unknown-linux-musl-portable
+    - name: Download aarch64-apple-darwin-portable artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-aarch64-apple-darwin-portable
+        path: target/aarch64-apple-darwin-portable
+    - name: Set permissions
+      run: |
+        chmod a+rx target/x86_64-apple-darwin-portable/juliaup
+        chmod a+rx target/x86_64-apple-darwin-portable/julia
+        chmod a+rx target/x86_64-unknown-linux-musl-portable/juliaup
+        chmod a+rx target/x86_64-unknown-linux-musl-portable/julia
+        chmod a+rx target/i686-unknown-linux-musl-portable/juliaup
+        chmod a+rx target/i686-unknown-linux-musl-portable/julia
+        chmod a+rx target/aarch64-unknown-linux-musl-portable/juliaup
+        chmod a+rx target/aarch64-unknown-linux-musl-portable/julia
+        chmod a+rx target/aarch64-apple-darwin-portable/juliaup
+        chmod a+rx target/aarch64-apple-darwin-portable/julia
+    - name: Export version
+      run: |
+        export VERSION=$(echo $GH_REF | sed 's:refs/tags/v::')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+      env:
+          GH_REF: ${{ github.ref }}
+    - name: Create archives
+      run: |
+        mkdir public
+
+        cd target/x86_64-apple-darwin-portable
+        tar -czvf ../../public/juliaup-${{ env.VERSION }}-x86_64-apple-darwin-portable.tar.gz .
+
+        cd ../../target/x86_64-unknown-linux-musl-portable
+        tar -czvf ../../public/juliaup-${{ env.VERSION }}-x86_64-unknown-linux-musl-portable.tar.gz .
+
+        cd ../../target/i686-unknown-linux-musl-portable
+        tar -czvf ../../public/juliaup-${{ env.VERSION }}-i686-unknown-linux-musl-portable.tar.gz .
+
+        cd ../../target/aarch64-unknown-linux-musl-portable
+        tar -czvf ../../public/juliaup-${{ env.VERSION }}-aarch64-unknown-linux-musl-portable.tar.gz .
+
+        cd ../../target/aarch64-apple-darwin-portable
+        tar -czvf ../../public/juliaup-${{ env.VERSION }}-aarch64-apple-darwin-portable.tar.gz .
+
+        cd ../..
+    - uses: actions/upload-artifact@v5
+      with:
+        name: portable-mac-linux
+        path: public/*.*
+
+  package-windows-portable:
+    needs: [build-juliaup,test-juliaup]
+    environment: package
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Download x86_64-pc-windows-gnu-portable artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-pc-windows-gnu-portable
+        path: target/x86_64-pc-windows-gnu-portable
+    - name: Download i686-pc-windows-gnu-portable artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-i686-pc-windows-gnu-portable
+        path: target/i686-pc-windows-gnu-portable
+    - name: Export version
+      run: |
+        export VERSION=$(echo $GH_REF | sed 's:refs/tags/v::')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+      shell: bash
+      env:
+          GH_REF: ${{ github.ref }}
+    - name: 'Azure CLI login with federated credential'
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZUREKEYVAULTCLIENTID }}
+        tenant-id: ${{ secrets.AZUREKEYVAULTTENANTID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Sign Windows x64 files
+      uses: azure/trusted-signing-action@v0.5.10
+      with:
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: juliahubwincertsaccount
+        certificate-profile-name: JuliaHubWinCert
+        files-folder: ${{ github.workspace }}\target\x86_64-pc-windows-gnu-portable
+        files-folder-filter: exe
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+    - name: Sign Windows x86 files
+      uses: azure/trusted-signing-action@v0.5.10
+      with:
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: juliahubwincertsaccount
+        certificate-profile-name: JuliaHubWinCert
+        files-folder: ${{ github.workspace }}\target\i686-pc-windows-gnu-portable
+        files-folder-filter: exe
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+    - name: Create archives
+      shell: bash
+      run: |
+        mkdir public
+
+        cd target/x86_64-pc-windows-gnu-portable
+        tar -czvf ../../public/juliaup-${{ env.VERSION }}-x86_64-pc-windows-gnu-portable.tar.gz .
+
+        cd ../../target/i686-pc-windows-gnu-portable
+        tar -czvf ../../public/juliaup-${{ env.VERSION }}-i686-pc-windows-gnu-portable.tar.gz .
+
+        cd ../..
+    - uses: actions/upload-artifact@v5
+      with:
+        name: portable-windows
+        path: public/*.*
+
+  package-windows-msix:
+    needs: [build-juliaup,test-juliaup]
+    runs-on: windows-latest
+    environment: package
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    # - name: Force old Powershell version
+    #   shell: cmd
+    #   run: |
+    #     set "extractPath=C:\Program Files\PowerShell\7"
+    #     curl -sLO https://github.com/PowerShell/PowerShell/releases/download/v7.2.17/PowerShell-7.2.17-win-x64.zip
+    #     RMDIR "%extractPath%" /S /Q
+    #     7z x PowerShell-7.2.17-win-x64.zip -o"%extractPath%"
+    #     pwsh --version
+    - uses: actions/checkout@v5
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+    - name: Install cargo-msix
+      run: cargo install cargo-msix
+    - name: Install StoreBroker
+      run: Install-Module -Name StoreBroker -Force
+    - name: Download and extract bundled Julia versions
+      run: |
+        $x64Versions = Get-Content versiondb\versiondb-x86_64-pc-windows-msvc.json | ConvertFrom-Json
+        $x64VersionFromChannel = $x64Versions.AvailableChannels.release.Version
+        $x64DownloadUrl = $x64Versions.AvailableVersions.$x64VersionFromChannel.UrlPath
+        $x64Filename = Split-Path $x64DownloadUrl -leaf
+
+        $x86Versions = Get-Content versiondb\versiondb-i686-pc-windows-msvc.json | ConvertFrom-Json
+        $x86VersionFromChannel = $x86Versions.AvailableChannels.release.Version
+        $x86DownloadUrl = $x86Versions.AvailableVersions.$x86VersionFromChannel.UrlPath
+        $x86Filename = Split-Path $x86DownloadUrl -leaf
+
+        mkdir -Force target\bundledjulia\downloads
+        mkdir -Force target\bundledjulia\extracted\x64
+        mkdir -Force target\bundledjulia\extracted\x86
+
+        Invoke-WebRequest "https://julialang-s3.julialang.org/$x64DownloadUrl" -OutFile "target\bundledjulia\downloads\$x64Filename"
+        tar -xvzf "target\bundledjulia\downloads\$x64Filename" -C target\bundledjulia\extracted\x64 --strip-components=1
+
+        Invoke-WebRequest "https://julialang-s3.julialang.org/$x86DownloadUrl" -OutFile "target\bundledjulia\downloads\$x86Filename"
+        tar -xvzf "target\bundledjulia\downloads\$x86Filename" -C target\bundledjulia\extracted\x86 --strip-components=1
+    - name: Download x86 Juliaup Windows Store artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-i686-pc-windows-msvc-windowsstore
+        path: target\windowsstore\i686-pc-windows-msvc\release
+    - name: Download x64 Juliaup Windows Store artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-pc-windows-msvc-windowsstore
+        path: target\windowsstore\x86_64-pc-windows-msvc\release
+    - name: Download x86 Juliaup Windows AppInstaller artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-i686-pc-windows-msvc-windowsappinstaller
+        path: target\winappinstaller\i686-pc-windows-msvc\release
+    - name: Download x64 Juliaup Windows AppInstaller artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-pc-windows-msvc-windowsappinstaller
+        path: target\winappinstaller\x86_64-pc-windows-msvc\release
+    - name: 'Azure CLI login with federated credential'
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZUREKEYVAULTCLIENTID }}
+        tenant-id: ${{ secrets.AZUREKEYVAULTTENANTID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Sign Store binary files
+      uses: azure/trusted-signing-action@v0.5.10
+      with:
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: juliahubwincertsaccount
+        certificate-profile-name: JuliaHubWinCert
+        files-folder: ${{ github.workspace }}\target\windowsstore
+        files-folder-recurse: true
+        files-folder-filter: exe
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+    - name: Sign Appinstaller binary files
+      uses: azure/trusted-signing-action@v0.5.10
+      with:
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: juliahubwincertsaccount
+        certificate-profile-name: JuliaHubWinCert
+        files-folder: ${{ github.workspace }}\target\winappinstaller
+        files-folder-recurse: true
+        files-folder-filter: exe
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+    - name: Build MSIX Windows Store
+      run: cargo msix --release --bundle-name winstoremsix --source-build-output-path ${{ format('{0}/target/windowsstore', github.workspace) }}
+    - name: Build MSIX App Installer
+      run: cargo msix --release --bundle-name winappinstallermsix --source-build-output-path ${{ format('{0}/target/winappinstaller', github.workspace) }}
+    - name: Sign msix files
+      uses: azure/trusted-signing-action@v0.5.10
+      with:
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: juliahubwincertsaccount
+        certificate-profile-name: JuliaHubWinCert
+        files-folder: ${{ github.workspace }}\target\msix\winappinstallermsix
+        # files-folder-filter: 
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+    - name: Package Windows Store payload
+      run: |
+        md (Join-Path $env:GITHUB_WORKSPACE "storepackage")
+        New-SubmissionPackage -ConfigPath (Join-Path $env:GITHUB_WORKSPACE "deploy" "winstoresubmission" "SBConfig.json") -PDPRootPath (Join-Path $env:GITHUB_WORKSPACE "deploy" "winstoresubmission" "pdps") -ImagesRootPath (Join-Path $env:GITHUB_WORKSPACE "deploy" "winstoresubmission" "images") -AppxPath target\msix\winstoremsix\*.appxbundle -OutPath (Join-Path $env:GITHUB_WORKSPACE "storepackage") -OutName Upload
+    - name: Rename and move juliainstaller
+      run: |
+        md public/winappinstaller
+        Move-Item target/msix/winappinstallermsix/* public/winappinstaller
+    - name: Upload to S3
+      run: |
+        aws s3 sync public s3://${{ secrets.AWS_S3_BUCKET }}/ --acl public-read --cache-control public,max-age=2678400 --metadata-directive REPLACE --region us-east-1 --no-progress
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - uses: actions/upload-artifact@v5
+      with:
+        name: storepackage
+        path: storepackage\*.*
+    - uses: actions/upload-artifact@v5
+      with:
+        name: winappinstaller
+        path: target\msix\winappinstaller\Julia.appinstaller
+
+  package-windows-msi:
+    needs: [build-juliaup,test-juliaup]
+    runs-on: windows-latest
+    environment: package
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - uses: actions/checkout@v5
+    - name: Install Wix
+      run: dotnet tool install --global wix --version 4.0.4
+    - name: Install Wix UI extensions
+      run: wix extension add -g WixToolset.UI.wixext/4.0.4
+    - name: Download x86 Juliaup Windows MSI artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-i686-pc-windows-gnu-msi
+        path: target\msi\i686-pc-windows-gnu\release
+    - name: Download x64 Juliaup Windows MSI artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: juliaup-x86_64-pc-windows-gnu-msi
+        path: target\msi\x86_64-pc-windows-gnu\release
+    - name: Copy artifacts file
+      run: |
+        Copy-Item ./deploy/msi/Bitmaps target\msi\x86_64-pc-windows-gnu\release\ -Recurse
+        Copy-Item ./deploy/msi/Bitmaps target\msi\i686-pc-windows-gnu\release\ -Recurse
+    - name: Export version
+      run: |
+        export VERSION=$(echo $GH_REF | sed 's:refs/tags/v::')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+      shell: bash
+      env:
+          GH_REF: ${{ github.ref }}
+    - name: 'Azure CLI login with federated credential'
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZUREKEYVAULTCLIENTID }}
+        tenant-id: ${{ secrets.AZUREKEYVAULTTENANTID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Sign x64 binary files
+      uses: azure/trusted-signing-action@v0.5.10
+      with:
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: juliahubwincertsaccount
+        certificate-profile-name: JuliaHubWinCert
+        files-folder: ${{ github.workspace }}\target\msi\x86_64-pc-windows-gnu\release
+        files-folder-filter: exe
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+    - name: Sign x86 binary files
+      uses: azure/trusted-signing-action@v0.5.10
+      with:
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: juliahubwincertsaccount
+        certificate-profile-name: JuliaHubWinCert
+        files-folder: ${{ github.workspace }}\target\msi\i686-pc-windows-gnu\release
+        files-folder-filter: exe
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256        
+    - name: Build MSI
+      run: |
+        wix build -ext WixToolset.UI.wixext .\deploy\msi\Julia.wxs -b .\target\msi\x86_64-pc-windows-gnu\release\ -arch x64 -o target\msi\Julia-v${{ env.VERSION }}-x64.msi -d ${{ env.VERSION }}
+        wix build -ext WixToolset.UI.wixext .\deploy\msi\Julia.wxs -b .\target\msi\i686-pc-windows-gnu\release\ -arch x86 -o target\msi\Julia-v${{ env.VERSION }}-x86.msi -d ${{ env.VERSION }}
+    - name: Sign MSI files
+      uses: azure/trusted-signing-action@v0.5.10
+      with:
+        endpoint: https://eus.codesigning.azure.net/
+        trusted-signing-account-name: juliahubwincertsaccount
+        certificate-profile-name: JuliaHubWinCert
+        files-folder: ${{ github.workspace }}\target\msi
+        files-folder-filter: msi
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+    - uses: actions/upload-artifact@v5
+      with:
+        name: msiinstallers
+        path: target\msi\Julia*.msi
+    - name: Rename and move MSI installer
+      run: |
+        md public/winmsi
+        Move-Item target/msi/Julia*.msi public/winmsi
+    - name: Upload to S3
+      run: |
+        aws s3 sync public s3://${{ secrets.AWS_S3_BUCKET }}/ --acl public-read --cache-control public,max-age=2678400 --metadata-directive REPLACE --region us-east-1 --no-progress
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  create-github-release:
+    needs: [test-juliaup]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Release
+      uses: ncipollo/release-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        prerelease: true
+        generateReleaseNotes: true
+
+  deploy-github-release-binaries:
+    needs: [create-github-release, package-unix-portable, package-windows-portable]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - uses: actions/download-artifact@v6
+      with:
+        name: portable-mac-linux
+        path: public
+    - uses: actions/download-artifact@v6
+      with:
+        name: portable-windows
+        path: public
+    - name: Release
+      uses: ncipollo/release-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: "public/*.*"
+        allowUpdates: true
+        omitBodyDuringUpdate: true
+        prerelease: true
+
+  deploy-dev-channel-winstore:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: dev-channel
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    # - name: Force old Powershell version
+    #   shell: cmd
+    #   run: |
+    #     set "extractPath=C:\Program Files\PowerShell\7"
+    #     curl -sLO https://github.com/PowerShell/PowerShell/releases/download/v7.2.17/PowerShell-7.2.17-win-x64.zip
+    #     RMDIR "%extractPath%" /S /Q
+    #     7z x PowerShell-7.2.17-win-x64.zip -o"%extractPath%"
+    #     pwsh --version
+    - name: Install StoreBroker
+      run: Install-Module -Name StoreBroker -Force
+    - uses: actions/download-artifact@v6
+      with:
+        name: storepackage
+    - name: Authenticate with store
+      env:
+        TENANTID: ${{ secrets.TENANTID }}
+        CLIENTID: ${{ secrets.CLIENTID }}
+        CLIENTSECRET: ${{ secrets.CLIENTSECRET }}
+      run: |
+        $sec = ConvertTo-SecureString $env:CLIENTSECRET -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential $env:CLIENTID, $sec
+        Set-StoreBrokerAuthentication -TenantId $env:TENANTID -Credential $cred
+        Update-ApplicationFlightSubmission -ReplacePackages -AppId 9NJNWW8PVKMN -FlightId 2e2f9fe8-3950-4273-b80d-7f752296ca86 -SubmissionDataPath ".\Upload.json" -PackagePath ".\Upload.zip" -AutoCommit -Force
+
+  deploy-releasepreview-channel-winstore:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: release-preview-channel
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    # - name: Force old Powershell version
+    #   shell: cmd
+    #   run: |
+    #     set "extractPath=C:\Program Files\PowerShell\7"
+    #     curl -sLO https://github.com/PowerShell/PowerShell/releases/download/v7.2.17/PowerShell-7.2.17-win-x64.zip
+    #     RMDIR "%extractPath%" /S /Q
+    #     7z x PowerShell-7.2.17-win-x64.zip -o"%extractPath%"
+    #     pwsh --version
+    - name: Install StoreBroker
+      run: Install-Module -Name StoreBroker -Force
+    - uses: actions/download-artifact@v6
+      with:
+        name: storepackage
+    - name: Authenticate with store
+      env:
+        TENANTID: ${{ secrets.TENANTID }}
+        CLIENTID: ${{ secrets.CLIENTID }}
+        CLIENTSECRET: ${{ secrets.CLIENTSECRET }}
+      run: |
+        $sec = ConvertTo-SecureString $env:CLIENTSECRET -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential $env:CLIENTID, $sec
+        Set-StoreBrokerAuthentication -TenantId $env:TENANTID -Credential $cred
+        Update-ApplicationFlightSubmission -ReplacePackages -AppId 9NJNWW8PVKMN -FlightId 732b234a-7ea9-4b65-8c9f-b9d9eaefb578 -SubmissionDataPath ".\Upload.json" -PackagePath ".\Upload.zip" -AutoCommit -Force
+
+  deploy-release-channel-winstore:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: release-channel
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    # - name: Force old Powershell version
+    #   shell: cmd
+    #   run: |
+    #     set "extractPath=C:\Program Files\PowerShell\7"
+    #     curl -sLO https://github.com/PowerShell/PowerShell/releases/download/v7.2.17/PowerShell-7.2.17-win-x64.zip
+    #     RMDIR "%extractPath%" /S /Q
+    #     7z x PowerShell-7.2.17-win-x64.zip -o"%extractPath%"
+    #     pwsh --version
+    - name: Install StoreBroker
+      run: Install-Module -Name StoreBroker -Force
+    - uses: actions/download-artifact@v6
+      with:
+        name: storepackage
+    - name: Authenticate with store
+      env:
+        TENANTID: ${{ secrets.TENANTID }}
+        CLIENTID: ${{ secrets.CLIENTID }}
+        CLIENTSECRET: ${{ secrets.CLIENTSECRET }}
+      run: |
+        $sec = ConvertTo-SecureString $env:CLIENTSECRET -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential $env:CLIENTID, $sec
+        Set-StoreBrokerAuthentication -TenantId $env:TENANTID -Credential $cred
+        Update-ApplicationSubmission -ReplacePackages -AppId 9NJNWW8PVKMN -SubmissionDataPath ".\Upload.json" -PackagePath ".\Upload.zip" -AutoCommit -Force
+
+  deploy-release-channel-brew:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: release-channel
+    runs-on: macos-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Update Homebrew formula
+      uses: dawidd6/action-homebrew-bump-formula@v5
+      with:
+        token: ${{secrets.TOKEN_FOR_HOMEBREW}}
+        formula: juliaup
+        force: true
+        tag: ${{ github.ref }}
+        revision: ${{ github.sha }}
+
+  deploy-release-channel-aur:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: release-channel
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout PKGBUILD repo
+        run: |
+          echo "$AUR_SSH_KEY" > ~/aur_ssh_key
+          chmod 600 ~/aur_ssh_key
+          git config --global core.sshCommand "ssh -i ~/aur_ssh_key -o 'StrictHostKeyChecking=no'"
+          git clone "aur@aur.archlinux.org:juliaup.git" .
+        env:
+          AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+      - name: Update version
+        run: |
+          export VERSION=$(echo $GH_REF | sed 's:refs/tags/v::')
+          sed -i "s/^pkgver=.*\$/pkgver=${VERSION}/g" PKGBUILD
+          sed -i "s/^pkgrel=.*\$/pkgrel=1/g" PKGBUILD
+        env:
+          GH_REF: ${{ github.ref }}
+      - name: Update .SRCINFO and checksum
+        uses: heyhusen/archlinux-package-action@v2.4.0
+        with:
+          flags: ''
+          namcap: false
+          updpkgsums: true
+          srcinfo: true
+      - name: Commit and push changes
+        run: |
+          export VERSION=$(echo $GH_REF | sed 's:refs/tags/v::')
+          git config --global user.email "simeondavidschaub99@gmail.com"
+          git config --global user.name 'Your friendly Juliaup bot'
+          git commit -a -m "Version ${VERSION} (automated version bump)"
+          git push origin master
+        env:
+          GH_REF: ${{ github.ref }}
+
+  deploy-dev-channel-s3:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: dev-channel
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v5
+      - name: Create output dirs
+        run: |
+          mkdir public
+          mkdir publicscript
+          mkdir publicscript/dev
+      - name: Export version
+        run: |
+          export VERSION=$(echo $GH_REF | sed 's:refs/tags/v::')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "$VERSION" > public/DEVCHANNELVERSION
+        env:
+          GH_REF: ${{ github.ref }}
+      - uses: actions/download-artifact@v6
+        with:
+          name: winappinstaller
+          path: publicscript
+      - name: Copy shell script
+        run: |
+          cp deploy/shellscript/juliaup-init.sh publicscript/dev/install.sh
+          sed -i -e "s/THISISREPLACEDWITHREALVERSIONINGITHUBWORKFLOW/$VERSION/g" publicscript/dev/install.sh
+          sed -i -e 's|THISISREPLACEDWITHCHANNELCONFIGINGITHUBWORKFLOW|--juliaup-channel dev|g' publicscript/dev/install.sh
+        env:
+          VERSION: ${{ env.VERSION }}
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --cache-control public,max-age=0 --metadata-directive REPLACE
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'public'
+      - name: Upload install script to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --cache-control public,max-age=0 --metadata-directive REPLACE
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_SCRIPT_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'publicscript'
+
+  deploy-releasepreview-channel-s3:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: release-preview-channel
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v5
+      - name: Create output dirs
+        run: |
+          mkdir public
+          mkdir publicscript
+          mkdir publicscript/releasepreview
+      - name: Export version
+        run: |
+          export VERSION=$(echo $GH_REF | sed 's:refs/tags/v::')
+          echo "$VERSION" > public/RELEASEPREVIEWCHANNELVERSION
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+        env:
+          GH_REF: ${{ github.ref }}
+      - name: Copy shell script
+        run: |
+          cp deploy/shellscript/juliaup-init.sh publicscript/releasepreview/install.sh
+          sed -i -e "s/THISISREPLACEDWITHREALVERSIONINGITHUBWORKFLOW/$VERSION/g" publicscript/releasepreview/install.sh
+          sed -i -e 's|THISISREPLACEDWITHCHANNELCONFIGINGITHUBWORKFLOW|--juliaup-channel releasepreview|g' publicscript/releasepreview/install.sh
+        env:
+          VERSION: ${{ env.VERSION }}
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --cache-control public,max-age=300 --metadata-directive REPLACE
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'public'
+      - name: Upload install script to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --cache-control public,max-age=300 --metadata-directive REPLACE
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_SCRIPT_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'publicscript'
+
+  deploy-release-channel-s3:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: release-channel
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v5
+      - name: Create output dirs
+        run: |
+          mkdir public
+          mkdir publicscript
+      - uses: actions/download-artifact@v6
+        with:
+          name: msiinstallers
+          path: publicscript
+      - name: Export version
+        run: |
+          export VERSION=$(echo $GH_REF | sed 's:refs/tags/v::')
+          echo "$VERSION"
+          echo "$VERSION" > public/RELEASECHANNELVERSION
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+        env:
+          GH_REF: ${{ github.ref }}
+      - name: Copy shell script
+        run: |
+          cp deploy/shellscript/juliaup-init.sh publicscript/install.sh
+          sed -i -e "s/THISISREPLACEDWITHREALVERSIONINGITHUBWORKFLOW/$VERSION/g" publicscript/install.sh
+          sed -i -e 's|THISISREPLACEDWITHCHANNELCONFIGINGITHUBWORKFLOW|--juliaup-channel release|g' publicscript/install.sh
+        env:
+          VERSION: ${{ env.VERSION }}
+      - name: Rename MSI installers
+        run: |
+          mv publicscript/Julia-v${{ env.VERSION }}-x64.msi publicscript/Julia-x64.msi
+          mv publicscript/Julia-v${{ env.VERSION }}-x86.msi publicscript/Julia-x86.msi
+        env:
+          VERSION: ${{ env.VERSION }}
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --cache-control public,max-age=3600 --metadata-directive REPLACE
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'public'
+      - name: Upload install script to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --cache-control public,max-age=3600 --metadata-directive REPLACE
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_SCRIPT_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'publicscript'
+
+  deploy-release-channel-github:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: release-channel
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Release
+      uses: ncipollo/release-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        prerelease: false
+        allowUpdates: true
+        omitBodyDuringUpdate: true
+
+  deploy-release-channel-crates:
+    needs: [create-github-release,package-unix,package-windows-msix,package-windows-msi]
+    environment: release-channel
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Publish to creates.io
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}

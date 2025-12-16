@@ -1,0 +1,39 @@
+name: rustfmt
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# https://github.com/reviewdog/action-suggester?tab=readme-ov-file#required-permissions
+permissions:
+  contents: read
+  checks: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  rustfmt:
+    name: Rustfmt Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.90.0
+          components: rustfmt
+      - name: Rustfmt check
+        if: ${{ github.event_name != 'pull_request' }}
+        run: cargo fmt -- --check -v
+      - name: Rustfmt PR
+        if: ${{ github.event_name == 'pull_request' }}
+        run: cargo fmt -- --check -v
+      - name: Suggest format changes
+        if: ${{ github.event_name == 'pull_request' && failure() }}
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: rustfmt
+          fail_level: error
