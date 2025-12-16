@@ -1,0 +1,20 @@
+["0.1.37"]
+SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
+
+["0.1.37-0"]
+Dictionaries = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
+StructArrays = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
+
+["0.1.43-0"]
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+["0.1.44-0"]
+DomainSets = "5b8099bc-c8ec-5219-889f-1d9e522a28bf"
+
+["0.1.49-0"]
+URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
+
+["0.1.56-0"]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"

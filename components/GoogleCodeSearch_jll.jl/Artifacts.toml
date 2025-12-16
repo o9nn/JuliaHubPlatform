@@ -1,0 +1,113 @@
+[[GoogleCodeSearch]]
+arch = "i686"
+git-tree-sha1 = "f623996ff6763118a049be0c30166315a0c25a06"
+libc = "musl"
+os = "linux"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "58658fdfe388fdbd95e12b9ca0fb984c75f4d0f5fa1d2b1e293a9bb3d0c3b89a"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.i686-linux-musl.tar.gz"
+[[GoogleCodeSearch]]
+arch = "aarch64"
+git-tree-sha1 = "2a0768629ffc59edf8409d97848d573b0c0b8464"
+libc = "musl"
+os = "linux"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "e04a58592571975184ff4a048c43484a2baa75451d48e5703265c7c5fd8b1975"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.aarch64-linux-musl.tar.gz"
+[[GoogleCodeSearch]]
+arch = "i686"
+git-tree-sha1 = "183ab5064f787d65ee7727a284a42a01f5995c26"
+os = "windows"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "9ac988e7d299d989f466290a0ac721d8f9bce5c3321b601f0029c0e1fef6e175"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.i686-w64-mingw32.tar.gz"
+[[GoogleCodeSearch]]
+arch = "x86_64"
+git-tree-sha1 = "e817f68602a5d3945b677e7d7f0d82c38a50c35d"
+os = "windows"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "ed2a6f2033cd6f79fdb9861a15a596e7ae1bff86b27062fbafec203980bad4cb"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.x86_64-w64-mingw32.tar.gz"
+[[GoogleCodeSearch]]
+arch = "armv7l"
+git-tree-sha1 = "3ce432eb5a6b190d7926ec160efb0dc46bfa826b"
+libc = "glibc"
+os = "linux"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "d67e8ab42a045a2860733690e8287223a8e963d6796fd16c980824549563bdd2"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.armv7l-linux-gnueabihf.tar.gz"
+[[GoogleCodeSearch]]
+arch = "armv7l"
+git-tree-sha1 = "5a5370bcf23dee90151d1e7ed04c9cac54741c12"
+libc = "musl"
+os = "linux"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "d911f4b8d80b70decd975f0c894045b524814def9ab8802c3de21b0e00f9f088"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.armv7l-linux-musleabihf.tar.gz"
+[[GoogleCodeSearch]]
+arch = "i686"
+git-tree-sha1 = "04fcbbb51efbc41ccc0ceb5fdb1fa3c20e1501d1"
+libc = "glibc"
+os = "linux"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "f3c8cfc361b6e78d4db13a0187065dbf224b20447d993cb985916743ca081743"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.i686-linux-gnu.tar.gz"
+[[GoogleCodeSearch]]
+arch = "x86_64"
+git-tree-sha1 = "0332692b75d565e9c6ebb8d2f2596092161532ea"
+libc = "glibc"
+os = "linux"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "16dbdc46b343b9168002c5e5a503dbf77880364453e59561b140475ffcff9201"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.x86_64-linux-gnu.tar.gz"
+[[GoogleCodeSearch]]
+arch = "powerpc64le"
+git-tree-sha1 = "8e9837bc32b3064f078668b01183abcf8bc12db9"
+libc = "glibc"
+os = "linux"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "e5d7178274614ef7ef668f25222f5b6734728095125b203016983ea13d706bc1"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.powerpc64le-linux-gnu.tar.gz"
+[[GoogleCodeSearch]]
+arch = "x86_64"
+git-tree-sha1 = "38b4c3d3c29903a98b1ba2dc02dcf9911b4be4e7"
+os = "macos"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "47e8e3eed3bad42b162014e6384b05992180a07535ce636e653516c4880223ad"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.x86_64-apple-darwin14.tar.gz"
+[[GoogleCodeSearch]]
+arch = "aarch64"
+git-tree-sha1 = "a92ad705e83d68877f4f76364d972a448b00d271"
+libc = "glibc"
+os = "linux"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "777c88c9f29234358055c7f3fa847df1232561379923521aadc739a782c52c74"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.aarch64-linux-gnu.tar.gz"
+[[GoogleCodeSearch]]
+arch = "x86_64"
+git-tree-sha1 = "7a1c8c3b2527e830dfbb57b64837d08a5410f31b"
+os = "freebsd"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "4cf5ac6068dcaa9b9763792331546048621aee3b392ac8b7b6d559b6bae27f0a"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.x86_64-unknown-freebsd11.1.tar.gz"
+[[GoogleCodeSearch]]
+arch = "x86_64"
+git-tree-sha1 = "3bb91a9398595d37a10b8d5a13403ee614d3f83d"
+libc = "musl"
+os = "linux"
+
+    [[GoogleCodeSearch.download]]
+    sha256 = "7513c89f1e4522e69c819f069960030645605474908751e9bd3f9de51a920f03"
+    url = "https://github.com/JuliaBinaryWrappers/GoogleCodeSearch_jll.jl/releases/download/GoogleCodeSearch-v1.2.0+0/GoogleCodeSearch.v1.2.0.x86_64-linux-musl.tar.gz"

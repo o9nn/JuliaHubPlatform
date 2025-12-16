@@ -1,0 +1,45 @@
+baseURL: https://fmi-standard.org
+title: Functional Mock-up Interface
+theme: ma-hugo-theme
+params:
+  logo: /assets/images/FMI_bare.svg
+  github: modelica/fmi-standard
+  email: contact@fmi-standard.org
+  gtag: G-TJX9TPG2XT
+menu:
+  main:
+    - pageRef: "tools"
+      identifier: "tools"
+      name: "Tools"
+      url: "/tools/"
+      weight: 1
+
+    - pageRef: "validation"
+      identifier: "validation"
+      name: "Validation"
+      url: "/validation/"
+      weight: 2
+
+    - pageRef: "literature"
+      identifier: "literature"
+      name: "Literature"
+      url: "/literature/"
+      weight: 3
+
+    - pageRef: "news"
+      identifier: "news"
+      name: "News"
+      url: "/news/"
+      weight: 4
+
+    - pageRef: "about"
+      identifier: "about"
+      name: "About"
+      url: "/about/"
+      weight: 5
+
+    - pageRef: "faq"
+      identifier: "faq"
+      name: "FAQ"
+      url: "/faq/"
+      weight: 6

@@ -1,0 +1,51 @@
+# See README.web.md for details on each key.
+
+[web]
+ip = ""
+port = 0
+# -- public IP used for openauth
+server_url = ""
+# -- only for the UI
+registry_url = ""
+stop_file = "stopwebui"
+# log_level = "INFO"
+# -- link to the repository that contains the registry
+# registry_clone_url = ""
+# registry_fork_url = ""
+# extra_providers = ""
+# registry_provider = ""
+# -- dependencies on other registries
+# registry_deps = []
+# disable_release_notes = false
+# route_prefix = ""
+# backend_port = 5555
+# allow_private = false
+# enable_logging = true
+
+[web.github]
+token = ""
+client_id = ""
+client_secret = ""
+# api_url = ""
+# auth_url = ""
+# token_url = ""
+# disable_rate_limits = false
+
+[web.gitlab]
+token = ""
+client_id = ""
+client_secret = ""
+# api_url = ""
+# auth_url = ""
+# token_url = ""
+# disable_rate_limits = false
+
+[web.bitbucket]
+# FORMAT: "USER:KEY" -- USER is the Bitbucket account, KEY is a Bitbucket "app password"
+token = ""
+client_id = ""
+client_secret = ""
+# api_url = ""
+auth_url = ""
+token_url = ""
+# disable_rate_limits = false
