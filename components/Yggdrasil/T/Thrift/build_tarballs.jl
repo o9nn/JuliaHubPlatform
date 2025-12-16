@@ -1,0 +1,69 @@
+# Note that this script can accept some limited command-line arguments, run
+# `julia build_tarballs.jl --help` to see a usage message.
+using BinaryBuilder, Pkg
+
+name = "Thrift"
+source_version = v"0.21.0" 
+version = v"0.21.1" # Bump rebuild for riscv, drop at next release
+
+# Collection of sources required to complete build
+sources = [
+    GitSource("https://github.com/apache/thrift.git", "1a31d9051d35b732a5fce258955ef95f576694ba"),
+    DirectorySource("bundled"),
+]
+
+# Bash recipe for building across all platforms
+script = raw"""
+cd $WORKSPACE/srcdir/thrift
+
+# Needed until https://github.com/apache/thrift/pull/3090 released
+for f in ${WORKSPACE}/srcdir/patches/*.patch; do
+    atomic_patch -p1 ${f}
+done
+
+CMAKE_FLAGS=(
+    -DCMAKE_INSTALL_PREFIX=${prefix}
+    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TARGET_TOOLCHAIN}
+    -DCMAKE_BUILD_TYPE=Release
+    -DBUILD_COMPILER=ON
+    -DBUILD_CPP=ON
+    -DBUILD_PYTHON=OFF
+    -DBUILD_TESTING=OFF
+    -DBUILD_JAVASCRIPT=OFF
+    -DBUILD_NODEJS=OFF
+    -DBUILD_SHARED_LIBS=ON
+    -DBUILD_TUTORIALS=OFF
+    -DTHRIFT_COMPILER_DELPHI=OFF
+)
+
+if [[ ${target} == *darwin* || ${target} == *freebsd* ]]; then
+    CMAKE_FLAGS+=(
+        # Avoid a problem in Boost by disabling a Clang compiler "warning" that is actually treated as error
+        -DCMAKE_CXX_FLAGS='-Wno-enum-constexpr-conversion'
+    )
+fi
+
+cmake -B cmake-build "${CMAKE_FLAGS[@]}"
+cmake --build cmake-build --parallel ${nproc}
+cmake --install cmake-build
+"""
+
+# These are the platforms we will build for by default, unless further
+# platforms are passed in on the command line
+platforms = expand_cxxstring_abis(supported_platforms())
+
+# The products that we will ensure are always built
+products = [
+    ExecutableProduct("thrift", :thrift)
+    LibraryProduct("libthrift", :libthrift)
+]
+
+# Dependencies that must be installed before this package can be built
+dependencies = [
+    Dependency("boost_jll", compat="=1.87.0"),
+]
+
+# Build the tarballs, and possibly a `build.jl` as well.
+build_tarballs(ARGS, name, version, sources, script, platforms, products, dependencies; julia_compat="1.6", preferred_gcc_version=v"7")
+
+# Build trigger: 1

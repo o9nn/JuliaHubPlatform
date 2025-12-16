@@ -1,0 +1,16 @@
+# We explicitly overwrite `/etc/profile` so that we don't pick up things
+# like `PATH` from the default system configuration.
+export CHARSET=UTF-8
+umask 022
+
+# Only source all of profile.d if we're actually `bash`
+if [ -n "${BASH_VERSION}" ]; then
+    for _script in /etc/profile.d/*.sh ; do
+        if [ -r "$_script" ] ; then
+            source "$_script"
+        fi
+    done
+else
+    # These things are actually necessary
+    source /etc/profile.d/0_bb_utils.sh
+fi

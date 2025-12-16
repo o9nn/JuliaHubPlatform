@@ -1,0 +1,101 @@
+(***********************************************************************)
+(*                                                                     *)
+(*                             Heptagon                                *)
+(*                                                                     *)
+(* Gwenael Delaval, LIG/INRIA, UJF                                     *)
+(* Leonard Gerard, Parkas, ENS                                         *)
+(* Adrien Guatto, Parkas, ENS                                          *)
+(* Cedric Pasteur, Parkas, ENS                                         *)
+(* Marc Pouzet, Parkas, ENS                                            *)
+(*                                                                     *)
+(* Copyright 2012 ENS, INRIA, UJF                                      *)
+(*                                                                     *)
+(* This file is part of the Heptagon compiler.                         *)
+(*                                                                     *)
+(* Heptagon is free software: you can redistribute it and/or modify it *)
+(* under the terms of the GNU General Public License as published by   *)
+(* the Free Software Foundation, either version 3 of the License, or   *)
+(* (at your option) any later version.                                 *)
+(*                                                                     *)
+(* Heptagon is distributed in the hope that it will be useful,         *)
+(* but WITHOUT ANY WARRANTY; without even the implied warranty of      *)
+(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       *)
+(* GNU General Public License for more details.                        *)
+(*                                                                     *)
+(* You should have received a copy of the GNU General Public License   *)
+(* along with Heptagon.  If not, see <http://www.gnu.org/licenses/>    *)
+(*                                                                     *)
+(***********************************************************************)
+
+(* The core module *)
+(* To compile : heptc -nopervasives pervasives.epi *)
+type bool = true | false
+type int
+type int8
+type uint8
+type int16
+type uint16
+type int32
+type uint32
+type int64
+type uint64
+type float
+type double
+type real = float
+type string
+external val fun (&)(bool;bool) returns (bool)
+
+(* int operators *)
+external val fun ( * )(int;int) returns (int)
+external val fun (%)(int;int) returns (int)
+external val fun (+)(int;int) returns (int)
+external val fun (-)(int;int) returns (int)
+external val fun (/)(int;int) returns (int)
+external val fun ( = )(int;int) returns (bool)
+external val fun ( <= )(int;int) returns (bool)
+external val fun ( < )(int;int) returns (bool)
+external val fun ( >= )(int;int) returns (bool)
+external val fun ( > )(int;int) returns (bool)
+external val fun (~-)(int) returns (int)
+external val fun (~~)(int) returns (int)
+external val fun (>>>)(int;int) returns (int)
+external val fun (<<<)(int;int) returns (int)
+external val fun (&&&)(int;int) returns (int)
+external val fun (|||)(int;int) returns (int)
+
+(* float operators *)
+external val fun ( *. )(float;float) returns (float)
+external val fun (+.)(float;float) returns (float)
+external val fun (-.)(float;float) returns (float)
+external val fun (/.)(float;float) returns (float)
+external val fun ( <=. )(float;float) returns (bool)
+external val fun ( <. )(float;float) returns (bool)
+external val fun ( >=. )(float;float) returns (bool)
+external val fun ( >. )(float;float) returns (bool)
+external val fun (~-.)(float) returns (float)
+
+
+(* boolean operators *)
+external val fun (not)(bool) returns (bool)
+external val fun (or)(bool;bool) returns (bool)
+external val fun (xor)(bool;bool) returns (bool)
+external val fun do_stuff(int) returns (int)
+external val fun between(int;int) returns (int)
+external val fun (=>)(bool;bool) returns (bool)
+
+external val fun exit(bool) returns ()
+external val fun assert(bool) returns ()
+
+(* Type conversion functions - these accept any numeric type via overloading
+   and are compiled to direct casts in the C backend *)
+external val fun int(int) returns (int)
+external val fun int8(int) returns (int8)
+external val fun uint8(int) returns (uint8)
+external val fun int16(int) returns (int16)
+external val fun uint16(int) returns (uint16)
+external val fun int32(int) returns (int32)
+external val fun uint32(int) returns (uint32)
+external val fun int64(int) returns (int64)
+external val fun uint64(int) returns (uint64)
+external val fun float(int) returns (float)
+external val fun double(int) returns (double)

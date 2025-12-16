@@ -1,0 +1,31 @@
+--- a/.git/config
++++ b/.git/config
+@@ -9,3 +9,11 @@
+ [branch "master"]
+ 	remote = origin
+ 	merge = refs/heads/master
++[submodule "cmake_modules/morse_cmake"]
++	active = true
++	url = https://gitlab.inria.fr/solverstack/morse_cmake.git
++	update = checkout
++[submodule "spm"]
++	active = true
++	url = https://gitlab.inria.fr/solverstack/spm.git
++	update = checkout
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -1,12 +1,12 @@
+ [submodule "cmake_modules/morse_cmake"]
+ 	path = cmake_modules/morse_cmake
+-	url = ../../solverstack/morse_cmake.git
++	url = https://gitlab.inria.fr/solverstack/morse_cmake.git
+ 	fetchRecurseSubmodules = true
+ 	ignored = untracked
+ 	update = checkout
+ [submodule "spm"]
+ 	path = spm
+-	url = ../../solverstack/spm.git
++	url = https://gitlab.inria.fr/solverstack/spm.git
+ 	fetchRecurseSubmodules = true
+ 	ignored = untracked
+ 	update = checkout

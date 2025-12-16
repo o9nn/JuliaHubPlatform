@@ -1,0 +1,4 @@
+__pycache__/
+/Manifest.toml
+/*.csv
+.CondaPkg/

@@ -1,0 +1,71 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        host: gitlab.freedesktop.org
+        headers:
+            Accept:
+                - text/html
+        url: https://gitlab.freedesktop.org/virgl/virglrenderer/-/commit/b05bb61f454eeb8a85164c8a31510aeb9d79129c
+        method: HEAD
+      response:
+        proto: HTTP/2.0
+        proto_major: 2
+        proto_minor: 0
+        content_length: -1
+        body: ""
+        headers:
+            Cache-Control:
+                - max-age=0, private, must-revalidate
+            Content-Security-Policy:
+                - ""
+            Content-Type:
+                - text/html; charset=utf-8
+            Date:
+                - Wed, 02 Jul 2025 01:37:42 GMT
+            Etag:
+                - W/"792da1429f77295c2ade86e5fa30699c"
+            Nel:
+                - '{"max_age": 0}'
+            Permissions-Policy:
+                - interest-cohort=()
+            Referrer-Policy:
+                - strict-origin-when-cross-origin
+            Set-Cookie:
+                - _gitlab_session=e5d4e33b350bfba869598ff67e814c0e; path=/; secure; HttpOnly; SameSite=None
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Accept
+            X-Cache:
+                - MISS
+            X-Cache-Hits:
+                - "0"
+            X-Content-Type-Options:
+                - nosniff
+            X-Download-Options:
+                - noopen
+            X-Frame-Options:
+                - SAMEORIGIN
+            X-Gitlab-Meta:
+                - '{"correlation_id":"01JZ4CGMSV5PPXZ1SJFCR0YDS5","version":"1"}'
+            X-Permitted-Cross-Domain-Policies:
+                - none
+            X-Request-Id:
+                - 01JZ4CGMSV5PPXZ1SJFCR0YDS5
+            X-Runtime:
+                - "0.767859"
+            X-Served-By:
+                - cache-syd10181-SYD
+            X-Ua-Compatible:
+                - IE=edge
+            X-Xss-Protection:
+                - 1; mode=block
+        status: 200 OK
+        code: 200
+        duration: 2.041797194s

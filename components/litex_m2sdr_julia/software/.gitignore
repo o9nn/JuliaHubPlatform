@@ -1,0 +1,9 @@
+*.a
+*.o
+*.d
+
+user/m2sdr_play
+user/m2sdr_record
+user/m2sdr_rf
+user/m2sdr_tone
+user/m2sdr_util

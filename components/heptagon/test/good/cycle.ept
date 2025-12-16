@@ -1,0 +1,10 @@
+(* Compiling this node with e7031de365ef causes an infinite loop in
+   the MiniLS pass Normalize memories. *)
+node f() returns (o : int)
+var r : bool; v : bool; c : bool;
+let
+  r = true fby c;
+  o = 0;
+  v = false fby c;
+  c = true fby v
+tel

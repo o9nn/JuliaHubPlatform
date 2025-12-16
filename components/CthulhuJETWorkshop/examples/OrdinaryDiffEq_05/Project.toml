@@ -1,0 +1,14 @@
+name = "OrdinaryDiffEq_05"
+uuid = "eb4741cb-6fb6-4b56-93bb-405d34349e9d"
+version = "0.1.0"
+authors = ["Cody Tapscott <topolarity@tapscott.me>"]
+
+[deps]
+ADTypes = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
+OrdinaryDiffEqCore = "bbf590c4-e513-4bbe-9b18-05decba2e5d8"
+OrdinaryDiffEqSDIRK = "2d112036-d095-4a1e-ab9a-08536f3ecdbf"
+
+[compat]
+ADTypes = "1.18.0"
+OrdinaryDiffEqCore = "1.34.0"
+OrdinaryDiffEqSDIRK = "1.7.0"

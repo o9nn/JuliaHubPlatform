@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: importer
+  labels:
+    cronLastSuccessfulTimeMins: "90"
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          tolerations:
+          - key: workloadType
+            operator: Equal
+            value: importer-pool
+          containers:
+          - name: importer
+            image: importer
+            imagePullPolicy: Always
+            volumeMounts:
+              - mountPath: "/work"
+                name: "ssd"
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: "1"
+                memory: "1G"
+              limits:
+                cpu: "1"
+                memory: "2G"
+          nodeSelector:
+            cloud.google.com/gke-nodepool: importer-pool
+          restartPolicy: Never
+          volumes:
+            - name: "ssd"
+              hostPath:
+                path: "/mnt/disks/ssd0"

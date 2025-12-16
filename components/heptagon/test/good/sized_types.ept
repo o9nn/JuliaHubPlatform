@@ -1,0 +1,216 @@
+(* Test sized integer types and operator overloading *)
+
+(* Test int8 operations *)
+node test_int8(a: int8; b: int8) returns (
+  add, sub, mul, div, mod_op: int8;
+  eq, lt, le, gt, ge: bool;
+  neg, bitnot: int8;
+  band, bor, shl, shr: int8
+)
+let
+  add = a + b;
+  sub = a - b;
+  mul = a * b;
+  div = a / b;
+  mod_op = a % b;
+  eq = a = b;
+  lt = a < b;
+  le = a <= b;
+  gt = a > b;
+  ge = a >= b;
+  neg = ~-a;
+  bitnot = ~~a;
+  band = a &&& b;
+  bor = a ||| b;
+  shl = a <<< b;
+  shr = a >>> b;
+tel
+
+(* Test uint8 operations *)
+node test_uint8(a: uint8; b: uint8) returns (
+  add, sub, mul, div, mod_op: uint8;
+  eq, lt, le, gt, ge: bool
+)
+let
+  add = a + b;
+  sub = a - b;
+  mul = a * b;
+  div = a / b;
+  mod_op = a % b;
+  eq = a = b;
+  lt = a < b;
+  le = a <= b;
+  gt = a > b;
+  ge = a >= b;
+tel
+
+(* Test int16 operations *)
+node test_int16(a: int16; b: int16) returns (
+  add, sub, mul, div: int16;
+  eq, lt: bool;
+  neg: int16
+)
+let
+  add = a + b;
+  sub = a - b;
+  mul = a * b;
+  div = a / b;
+  eq = a = b;
+  lt = a < b;
+  neg = ~-a;
+tel
+
+(* Test int32 operations *)
+node test_int32(a: int32; b: int32) returns (
+  add, sub, mul, div: int32;
+  eq, lt: bool;
+  neg: int32
+)
+let
+  add = a + b;
+  sub = a - b;
+  mul = a * b;
+  div = a / b;
+  eq = a = b;
+  lt = a < b;
+  neg = ~-a;
+tel
+
+(* Test int64 operations *)
+node test_int64(a: int64; b: int64) returns (
+  add, sub, mul, div: int64;
+  eq, lt: bool;
+  neg: int64
+)
+let
+  add = a + b;
+  sub = a - b;
+  mul = a * b;
+  div = a / b;
+  eq = a = b;
+  lt = a < b;
+  neg = ~-a;
+tel
+
+(* Test uint64 operations *)
+node test_uint64(a: uint64; b: uint64) returns (
+  add, sub, mul, div: uint64;
+  eq, lt: bool
+)
+let
+  add = a + b;
+  sub = a - b;
+  mul = a * b;
+  div = a / b;
+  eq = a = b;
+  lt = a < b;
+tel
+
+(* Test double-precision float operations *)
+node test_double(a: double; b: double) returns (
+  add, sub, mul, div: double;
+  lt, le, gt, ge: bool;
+  neg: double
+)
+let
+  add = a +. b;
+  sub = a -. b;
+  mul = a *. b;
+  div = a /. b;
+  lt = a <. b;
+  le = a <=. b;
+  gt = a >. b;
+  ge = a >=. b;
+  neg = ~-.a;
+tel
+
+(* Test type conversions *)
+node test_conversions(i: int; i8: int8; i32: int32; i64: int64; f: float; d: double) returns (
+  to_int: int;
+  to_int8: int8;
+  to_int16: int16;
+  to_int32: int32;
+  to_int64: int64;
+  to_uint8: uint8;
+  to_uint16: uint16;
+  to_uint32: uint32;
+  to_uint64: uint64;
+  to_float: float;
+  to_double: double
+)
+let
+  (* Convert from int *)
+  to_int8 = int8(i);
+  to_int16 = int16(i);
+  to_int32 = int32(i);
+  to_int64 = int64(i);
+  to_uint8 = uint8(i);
+  to_uint16 = uint16(i);
+  to_uint32 = uint32(i);
+  to_uint64 = uint64(i);
+  to_float = float(i);
+  to_double = double(i);
+  (* Convert back to int *)
+  to_int = int(i32);
+tel
+
+(* Test cross-type conversions *)
+node test_cross_conversions(i8: int8; i64: int64; f: float) returns (
+  i8_to_i64: int64;
+  i64_to_i8: int8;
+  i8_to_float: float;
+  float_to_i32: int32;
+  float_to_double: double;
+  double_to_float: float
+)
+let
+  i8_to_i64 = int64(i8);
+  i64_to_i8 = int8(i64);
+  i8_to_float = float(i8);
+  float_to_i32 = int32(f);
+  float_to_double = double(f);
+  double_to_float = float(float_to_double);
+tel
+
+(* Test mixed operations - operations between same types *)
+node test_mixed(i32a: int32; i32b: int32; i64a: int64; i64b: int64) returns (
+  r32: int32;
+  r64: int64
+)
+let
+  r32 = i32a + i32b * int32(2);
+  r64 = i64a - i64b / int64(3);
+tel
+
+(* Test literals with sized types *)
+node test_literals() returns (
+  i8: int8;
+  u8: uint8;
+  i32: int32;
+  i64: int64;
+  d: double
+)
+let
+  i8 = int8(42);
+  u8 = uint8(255);
+  i32 = int32(100000);
+  i64 = int64(9999999999);
+  d = double(3);
+tel
+
+(* Main test node *)
+node main() returns (ok: bool)
+var
+  i8_add: int8;
+  i32_neg: int32;
+  i64_mul: int64;
+  d_div: double;
+  conv_i32: int32;
+let
+  i8_add = int8(1) + int8(2);
+  i32_neg = ~-int32(5);
+  i64_mul = int64(100) * int64(200);
+  d_div = double(10) /. double(3);
+  conv_i32 = int32(int64(42));
+  ok = (i8_add = int8(3)) & (i32_neg = int32(-5));
+tel

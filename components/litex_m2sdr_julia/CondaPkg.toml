@@ -1,0 +1,11 @@
+channels = ["anaconda", "conda-forge"]
+
+[deps]
+python = "3.10.*"
+
+[pip.deps]
+migen = "@https://github.com/m-labs/migen/archive/4c2ae8dfeea37f235b52acb8166f12acaaae4f7c.zip"
+litex = "@https://github.com/enjoy-digital/litex/archive/refs/heads/master.zip"
+liteeth = "@https://github.com/enjoy-digital/liteeth/archive/refs/heads/master.zip"
+litepcie = "@https://github.com/enjoy-digital/litepcie/archive/refs/heads/master.zip"
+litex_m2sdr = "@https://github.com/enjoy-digital/litex_m2sdr/archive/refs/heads/main.zip"

@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cpe-repo-gen
+  labels:
+    cronLastSuccessfulTimeMins: "2880"
+spec:
+  schedule: "0 6 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 86400
+      template:
+        spec:
+          containers:
+          - name: cpe-repo-gen
+            image: cpe-repo-gen
+            imagePullPolicy: Always
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: "1"
+                memory: "2G"
+              limits:
+                cpu: "1"
+                memory: "4G"
+            env:
+              - name: WORK_DIR
+                value: /scratch
+          restartPolicy: Never
+          volumes:
+            - name: "ssd"
+              hostPath:
+                path: "/mnt/disks/ssd0"

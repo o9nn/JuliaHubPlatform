@@ -1,0 +1,104 @@
+diff --git a/connector/github/github.go b/connector/github/github.go
+index 18a56628..9bbe1e2c 100644
+--- a/connector/github/github.go
++++ b/connector/github/github.go
+@@ -39,17 +39,18 @@ var (
+ 
+ // Config holds configuration options for github logins.
+ type Config struct {
+-	ClientID             string `json:"clientID"`
+-	ClientSecret         string `json:"clientSecret"`
+-	RedirectURI          string `json:"redirectURI"`
+-	Org                  string `json:"org"`
+-	Orgs                 []Org  `json:"orgs"`
+-	HostName             string `json:"hostName"`
+-	RootCA               string `json:"rootCA"`
+-	TeamNameField        string `json:"teamNameField"`
+-	LoadAllGroups        bool   `json:"loadAllGroups"`
+-	UseLoginAsID         bool   `json:"useLoginAsID"`
+-	PreferredEmailDomain string `json:"preferredEmailDomain"`
++	ClientID             string   `json:"clientID"`
++	ClientSecret         string   `json:"clientSecret"`
++	RedirectURI          string   `json:"redirectURI"`
++	Org                  string   `json:"org"`
++	Orgs                 []Org    `json:"orgs"`
++	HostName             string   `json:"hostName"`
++	RootCA               string   `json:"rootCA"`
++	TeamNameField        string   `json:"teamNameField"`
++	LoadAllGroups        bool     `json:"loadAllGroups"`
++	UseLoginAsID         bool     `json:"useLoginAsID"`
++	PreferredEmailDomain string   `json:"preferredEmailDomain"`
++	AdditionalScopes     []string `json:"additionalScopes"`
+ }
+ 
+ // Org holds org-team filters, in which teams are optional.
+@@ -85,6 +86,7 @@ func (c *Config) Open(id string, logger *slog.Logger) (connector.Connector, erro
+ 		logger:               logger.With(slog.Group("connector", "type", "github", "id", id)),
+ 		useLoginAsID:         c.UseLoginAsID,
+ 		preferredEmailDomain: c.PreferredEmailDomain,
++		additionalScopes:     c.AdditionalScopes,
+ 	}
+ 
+ 	if c.HostName != "" {
+@@ -159,6 +161,8 @@ type githubConnector struct {
+ 	useLoginAsID bool
+ 	// the domain to be preferred among the user's emails. e.g. "github.com"
+ 	preferredEmailDomain string
++	// optional scopes to be requested apart from what the connector itself needs
++	additionalScopes []string
+ }
+ 
+ // groupsRequired returns whether dex requires GitHub's 'read:org' scope. Dex
+@@ -175,6 +179,10 @@ func (c *githubConnector) oauth2Config(scopes connector.Scopes) *oauth2.Config {
+ 	if c.groupsRequired(scopes.Groups) {
+ 		githubScopes = append(githubScopes, scopeOrgs)
+ 	}
++	if len(c.additionalScopes) > 0 {
++		c.logger.Warn(fmt.Sprintf("github: requesting additional scopes %v", c.additionalScopes))
++		githubScopes = append(githubScopes, c.additionalScopes...)
++	}
+ 
+ 	endpoint := github.Endpoint
+ 	// case when it is a GitHub Enterprise account.
+diff --git a/connector/gitlab/gitlab.go b/connector/gitlab/gitlab.go
+index 7aa44398..4e7cffc4 100644
+--- a/connector/gitlab/gitlab.go
++++ b/connector/gitlab/gitlab.go
+@@ -35,6 +35,7 @@ type Config struct {
+ 	Groups              []string `json:"groups"`
+ 	UseLoginAsID        bool     `json:"useLoginAsID"`
+ 	GetGroupsPermission bool     `json:"getGroupsPermission"`
++	AdditionalScopes    []string `json:"additionalScopes,omitempty"`
+ }
+ 
+ type gitlabUser struct {
+@@ -60,6 +61,7 @@ func (c *Config) Open(id string, logger *slog.Logger) (connector.Connector, erro
+ 		groups:              c.Groups,
+ 		useLoginAsID:        c.UseLoginAsID,
+ 		getGroupsPermission: c.GetGroupsPermission,
++		additionalScopes:    c.AdditionalScopes,
+ 	}, nil
+ }
+ 
+@@ -87,6 +89,9 @@ type gitlabConnector struct {
+ 
+ 	// if set to true permissions will be added to list of groups
+ 	getGroupsPermission bool
++
++	// optional scopes to be requested apart from what the connector itself needs
++	additionalScopes []string
+ }
+ 
+ func (c *gitlabConnector) oauth2Config(scopes connector.Scopes) *oauth2.Config {
+@@ -94,7 +99,10 @@ func (c *gitlabConnector) oauth2Config(scopes connector.Scopes) *oauth2.Config {
+ 	if c.groupsRequired(scopes.Groups) {
+ 		gitlabScopes = []string{scopeUser, scopeOpenID}
+ 	}
+-
++	if len(c.additionalScopes) > 0 {
++		c.logger.Warn(fmt.Sprintf("gitlab: requesting additional scopes %v", c.additionalScopes))
++		gitlabScopes = append(gitlabScopes, c.additionalScopes...)
++	}
+ 	gitlabEndpoint := oauth2.Endpoint{AuthURL: c.baseURL + "/oauth/authorize", TokenURL: c.baseURL + "/oauth/token"}
+ 	return &oauth2.Config{
+ 		ClientID:     c.clientID,

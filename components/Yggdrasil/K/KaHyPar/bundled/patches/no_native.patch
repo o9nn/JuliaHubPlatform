@@ -1,0 +1,21 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9065a70e..c7ad682b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -251,14 +251,8 @@ if(NOT MSVC)
+ 
+   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -g3")
+ 
+-  if(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm64")
+-    # M1 doesn't seem to support -mtune=native -march=native
+-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g3 ")
+-  else()
+-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -mtune=native -march=native")
+-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -mtune=native -march=native -g3 ")
+-  endif()
++  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
++  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g3 ")
+ 
+ if(DEFINED ENV{TRAVIS_ENV})  
+   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mno-avx")

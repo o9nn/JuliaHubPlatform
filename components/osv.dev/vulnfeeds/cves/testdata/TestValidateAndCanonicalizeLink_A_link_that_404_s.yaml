@@ -1,0 +1,55 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        host: github.com
+        headers:
+            Accept:
+                - text/html
+        url: https://github.com/WebKit/webkit/commit/6f9b511a115311b13c06eb58038ddc2c78da5531
+        method: HEAD
+      response:
+        proto: HTTP/2.0
+        proto_major: 2
+        proto_minor: 0
+        content_length: -1
+        body: ""
+        headers:
+            Cache-Control:
+                - no-cache
+            Content-Security-Policy:
+                - 'default-src ''none''; base-uri ''self''; child-src github.githubassets.com github.com/assets-cdn/worker/ github.com/assets/ gist.github.com/assets-cdn/worker/; connect-src ''self'' uploads.github.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com *.rel.tunnels.api.visualstudio.com wss://*.rel.tunnels.api.visualstudio.com objects-origin.githubusercontent.com copilot-proxy.githubusercontent.com proxy.individual.githubcopilot.com proxy.business.githubcopilot.com proxy.enterprise.githubcopilot.com *.actions.githubusercontent.com wss://*.actions.githubusercontent.com productionresultssa0.blob.core.windows.net/ productionresultssa1.blob.core.windows.net/ productionresultssa2.blob.core.windows.net/ productionresultssa3.blob.core.windows.net/ productionresultssa4.blob.core.windows.net/ productionresultssa5.blob.core.windows.net/ productionresultssa6.blob.core.windows.net/ productionresultssa7.blob.core.windows.net/ productionresultssa8.blob.core.windows.net/ productionresultssa9.blob.core.windows.net/ productionresultssa10.blob.core.windows.net/ productionresultssa11.blob.core.windows.net/ productionresultssa12.blob.core.windows.net/ productionresultssa13.blob.core.windows.net/ productionresultssa14.blob.core.windows.net/ productionresultssa15.blob.core.windows.net/ productionresultssa16.blob.core.windows.net/ productionresultssa17.blob.core.windows.net/ productionresultssa18.blob.core.windows.net/ productionresultssa19.blob.core.windows.net/ github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com insights.github.com wss://alive.github.com api.githubcopilot.com api.individual.githubcopilot.com api.business.githubcopilot.com api.enterprise.githubcopilot.com; font-src github.githubassets.com; form-action ''self'' github.com gist.github.com copilot-workspace.githubnext.com objects-origin.githubusercontent.com; frame-ancestors ''none''; frame-src viewscreen.githubusercontent.com notebooks.githubusercontent.com; img-src ''self'' data: blob: github.githubassets.com media.githubusercontent.com camo.githubusercontent.com identicons.github.com avatars.githubusercontent.com private-avatars.githubusercontent.com github-cloud.s3.amazonaws.com objects.githubusercontent.com release-assets.githubusercontent.com secured-user-images.githubusercontent.com/ user-images.githubusercontent.com/ private-user-images.githubusercontent.com opengraph.githubassets.com copilotprodattachments.blob.core.windows.net/github-production-copilot-attachments/ github-production-user-asset-6210df.s3.amazonaws.com customer-stories-feed.github.com spotlights-feed.github.com objects-origin.githubusercontent.com *.githubusercontent.com; manifest-src ''self''; media-src github.com user-images.githubusercontent.com/ secured-user-images.githubusercontent.com/ private-user-images.githubusercontent.com github-production-user-asset-6210df.s3.amazonaws.com gist.github.com; script-src github.githubassets.com; style-src ''unsafe-inline'' github.githubassets.com; upgrade-insecure-requests; worker-src github.githubassets.com github.com/assets-cdn/worker/ github.com/assets/ gist.github.com/assets-cdn/worker/'
+            Content-Type:
+                - text/html; charset=utf-8
+            Date:
+                - Wed, 02 Jul 2025 01:37:40 GMT
+            Referrer-Policy:
+                - no-referrer-when-downgrade
+            Server:
+                - github.com
+            Set-Cookie:
+                - _gh_sess=A7WFIFatbel2fKPv%2Fg%2BH1GM%2FTLtP4U3jhokD5yKs5Pwo%2BzhPXeUAPaPGO8JLQ4ygLdxSqqdoWJ2KfJkIotgaxzysG0SnF%2FHjrsrwvEUxOS8V8%2FLKD2KltrW%2FXtiZT%2Fl2SDvk9Diqkp%2BAu8Q%2BS2amEU2NBOlhMe0w3SYOKUGQC6d61DNXLiqSFp61ZjEex9ANzxCCpQ%2BAOi0e1Qb5Tnz2BNn7NpPCNRAMbf8BM1DOraA1SPOItA5%2BWNcZzClvA1bNV5Wh%2BRbjUTNr%2FSveYOzySw%3D%3D--SWRNqcOhMjxHYtF2--AoDZLLKaHSXefXGNvHqsUg%3D%3D; Path=/; HttpOnly; Secure; SameSite=Lax
+                - _octo=GH1.1.525596442.1751420273; Path=/; Domain=github.com; Expires=Thu, 02 Jul 2026 01:37:53 GMT; Secure; SameSite=Lax
+                - logged_in=no; Path=/; Domain=github.com; Expires=Thu, 02 Jul 2026 01:37:53 GMT; HttpOnly; Secure; SameSite=Lax
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubdomains; preload
+            Vary:
+                - X-PJAX, X-PJAX-Container, Turbo-Visit, Turbo-Frame, X-Requested-With,Accept-Encoding, Accept, X-Requested-With
+            X-Content-Type-Options:
+                - nosniff
+            X-Frame-Options:
+                - deny
+            X-Github-Request-Id:
+                - 8B0A:F9F90:5808C:66CDB:68648D6F
+            X-Repository-Download:
+                - git clone https://github.com/WebKit/WebKit.git
+            X-Xss-Protection:
+                - "0"
+        status: 404 Not Found
+        code: 404
+        duration: 95.848758ms

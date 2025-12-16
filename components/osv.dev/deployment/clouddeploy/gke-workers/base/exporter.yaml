@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: exporter
+  labels:
+    cronLastSuccessfulTimeMins: "180"
+spec:
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  # If the previous job overruns by more than a minute,
+  # Don't try to immediately queue up the next job
+  startingDeadlineSeconds: 60
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          tolerations:
+          - key: workloadType
+            operator: Equal
+            value: highend
+          nodeSelector:
+            cloud.google.com/gke-nodepool: highend
+          containers:
+          - name: exporter
+            image: exporter
+            imagePullPolicy: Always
+            volumeMounts:
+              - mountPath: "/work"
+                name: "ssd"
+            resources:
+              requests:
+                cpu: "12"
+                memory: "48G"
+              limits:
+                cpu: "24"
+                memory: "128G"
+          restartPolicy: Never
+          volumes:
+            - name: "ssd"
+              emptyDir:
+                sizeLimit: 60Gi

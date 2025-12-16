@@ -1,0 +1,16 @@
+go.work
+go.work.sum
+*.pyc
+*.iml
+__pycache__/
+.idea/
+*.egg-info
+build/lib
+.vscode
+*.tfstate*
+.history/*
+**/.history/*
+*/datastore-helper/
+hurl-scripts/
+temp/*
+**/tmp/**
