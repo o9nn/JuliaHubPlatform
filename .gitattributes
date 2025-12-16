@@ -1,0 +1,41 @@
+# Handle line endings automatically for files detected as text
+* text=auto
+
+# Explicitly declare text files to ensure consistent line endings
+*.jl text
+*.md text
+*.txt text
+*.yml text
+*.yaml text
+*.json text
+*.toml text
+*.xml text
+*.html text
+*.css text
+*.js text
+*.ts text
+*.py text
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Declare binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# Julia-specific
+*.ji binary
+
+# Git LFS (if needed for large files)
+# *.dat filter=lfs diff=lfs merge=lfs -text
