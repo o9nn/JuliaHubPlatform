@@ -1,0 +1,6 @@
+[0]
+DelimitedFiles = "1.4.0-1"
+Distributions = "0.25"
+ITensors = "0.3"
+OrdinaryDiffEq = "6"
+julia = "1.4.0-1"

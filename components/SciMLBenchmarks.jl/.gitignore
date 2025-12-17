@@ -1,0 +1,21 @@
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+*.tmp
+*.aux
+*.log
+*.out
+*.tex
+tmp*/
+gks.svg
+/*/*/jl_*/
+/Manifest.toml
+
+.vscode
+.vscode/*
+
+# We're going to store these in a separate repository now
+html/
+script/
+pdf/
+notebook/
+markdown/

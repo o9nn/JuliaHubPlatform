@@ -1,0 +1,119 @@
+# This is a pipeline that runs a benchmark, then uploads the resultant
+# .PDF and other reports as (buildkite, not Julia) artifacts.  The `coppermind`
+# configuration memoizes the result, so that identical inputs don't get
+# benchmarked multiple times.
+
+steps:
+  - label: ":hammer: {PATH}"
+    key: "benchmark-{SANITIZED_PATH}"
+    env:
+      BUILDKITE_PLUGIN_CRYPTIC_BASE64_SIGNED_JOB_ID_SECRET: ${BUILDKITE_PLUGIN_CRYPTIC_BASE64_SIGNED_JOB_ID_SECRET?}
+    plugins:
+      - staticfloat/cryptic#v2:
+          variables:
+            - BUILDKITE_S3_ACCESS_KEY_ID="U2FsdGVkX19PKaFjxITJxFlY66D/vA9T/y/MzZ2Fs+bpWmlhRF0g5DbemJbuKKw9"
+            - BUILDKITE_S3_SECRET_ACCESS_KEY="U2FsdGVkX19MkMLkCxkclrpxYMfzHvYlUJssaSbX/wkdNiL+H5/aHwiYiTsBXyXh2m/1pcIUMHCR0nerHevB8g=="
+            - BUILDKITE_S3_DEFAULT_REGION="U2FsdGVkX18ccoE9FmtkwsCm1x0MLMBlN/FLcAyKkY4="
+      - JuliaCI/julia#v1:
+          version: 1.8
+      - staticfloat/sandbox:
+          rootfs_url: "https://github.com/ven-k/Placeholder/releases/download/v0.23.0/aws_uploader.x86_64.tar.gz"
+          rootfs_treehash: "d46b35aa927024de8729d63fde18442a0a590e62"
+          workspaces:
+            # Include the julia we just downloaded
+            - "/cache/julia-buildkite-plugin:/cache/julia-buildkite-plugin"
+      - staticfloat/coppermind#v1:
+          inputs:
+            # We are sensitive to the actual benchmark changing
+            - {PATH}
+            # We are sensitive to the source code of this package changing
+            - src/**/*.jl
+            # We are sensitive to our overall dependencies changing
+            - ./*.toml
+          outputs:
+            #- html/**/*.html
+            - markdown/**/figures/*.png
+            - markdown/**/*.md
+            - notebook/**/*.ipynb
+            - pdf/**/*.pdf
+            - script/**/*.jl
+          s3_prefix: s3://julialang-buildkite-artifacts/scimlbenchmarks
+    timeout_in_minutes: 4000
+    commands: |
+      # Instantiate, to install the overall project dependencies, and `build()` for conda
+      echo "--- Instantiate"
+      julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.build()'
+
+      if [[ {PATH} == *BayesianInference* ]]
+      then
+        export CMDSTAN_HOME="$(pwd)/cmdstan-2.29.2/"
+        pwd
+        curl -LO https://github.com/stan-dev/cmdstan/releases/download/v2.29.2/cmdstan-2.29.2.tar.gz
+        tar -xzpf cmdstan-2.29.2.tar.gz --no-same-owner
+        ls -lia .
+        ls -lia ./cmdstan-2.29.2
+        ls -lia ./cmdstan-2.29.2/make
+        touch ./cmdstan-2.29.2/make/local
+        echo "STAN_THREADS=true" > ./cmdstan-2.29.2/make/local
+        echo "g++ version"
+        echo $(g++ -v)
+        cd cmdstan-2.29.2
+        make build
+        cd -
+      fi
+
+      # Run benchmark
+      echo "+++ Run benchmark for {PATH}"
+      julia --threads=auto --project=. benchmark.jl "{PATH}"
+    agents:
+      queue: "juliaecosystem"
+      sandbox_capable: true
+      exclusive: true
+      arch: "x86_64"
+
+  - label: ":rocket: Publish {PATH}"
+    env:
+      BUILDKITE_PLUGIN_CRYPTIC_BASE64_SIGNED_JOB_ID_SECRET: ${BUILDKITE_PLUGIN_CRYPTIC_BASE64_SIGNED_JOB_ID_SECRET?}
+    plugins:
+      - staticfloat/cryptic#v2:
+          variables:
+            - BUILDKITE_S3_ACCESS_KEY_ID="U2FsdGVkX19PKaFjxITJxFlY66D/vA9T/y/MzZ2Fs+bpWmlhRF0g5DbemJbuKKw9"
+            - BUILDKITE_S3_SECRET_ACCESS_KEY="U2FsdGVkX19MkMLkCxkclrpxYMfzHvYlUJssaSbX/wkdNiL+H5/aHwiYiTsBXyXh2m/1pcIUMHCR0nerHevB8g=="
+            - BUILDKITE_S3_DEFAULT_REGION="U2FsdGVkX18ccoE9FmtkwsCm1x0MLMBlN/FLcAyKkY4="
+          files:
+            - .buildkite/ssh_deploy.key
+      - JuliaCI/julia#v1:
+          version: 1.8
+      - staticfloat/sandbox:
+          rootfs_url: "https://jc-rootfs-images.s3.amazonaws.com/aws_uploader-2021-11-12.x86_64.tar.gz"
+          rootfs_treehash: "986217e5b36efd3b3b91ed90df8e36d628cf543f"
+          workspaces:
+            # Include the julia we just downloaded
+            - "/cache/julia-buildkite-plugin:/cache/julia-buildkite-plugin"
+      # Use coppermind to download the benchmark results that were calculated in the
+      # benchmarking job above.  Note we still list `outputs` here, since we have the
+      # option to extract only a subset of them here.
+      - staticfloat/coppermind#v1:
+          input_from: "benchmark-{SANITIZED_PATH}"
+          outputs:
+            #- html/**/*.html
+            - markdown/**/figures/*.png
+            - markdown/**/*.md
+            - notebook/**/*.ipynb
+            - pdf/**/*.pdf
+            - script/**/*.jl
+          s3_prefix: s3://julialang-buildkite-artifacts/scimlbenchmarks
+      - staticfloat/ssh-agent:
+          keyfiles:
+            - .buildkite/ssh_deploy.key
+    agents:
+      queue: "juliaecosystem"
+      sandbox_capable: true
+      arch: "x86_64"
+    concurrency: 1
+    concurrency_group: "scimlbenchmarks/deploy"
+    commands: .buildkite/publish_benchmark_output.sh
+    # Don't run this unless we're on the master branch, and not until the actual benchmark
+    # command has had a chance to run.
+    depends_on: "benchmark-{SANITIZED_PATH}"
+    branches: "master"

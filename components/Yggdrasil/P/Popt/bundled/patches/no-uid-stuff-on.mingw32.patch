@@ -1,0 +1,31 @@
+--- popt-1.19/src/popt.c
++++ popt-1.19/src/popt.c
+@@ -501,28 +501,6 @@
+     rc = setresuid(getuid(), getuid(),-1);
+     if (rc) goto exit;
+ #else
+-/*
+- * XXX " ... on BSD systems setuid() should be preferred over setreuid()"
+- * XXX 	sez' Timur Bakeyev <mc@bat.ru>
+- * XXX	from Norbert Warmuth <nwarmuth@privat.circular.de>
+- */
+-#if defined(HAVE_SETUID)
+-    rc = setgid(getgid());
+-    if (rc) goto exit;
+-    rc = setuid(getuid());
+-    if (rc) goto exit;
+-#elif defined (HAVE_SETREUID)
+-    rc = setregid(getgid(), getgid());
+-    if (rc) goto exit;
+-    rc = setreuid(getuid(), getuid());
+-    if (rc) goto exit;
+-#else
+-    /* refuse to exec if we cannot drop suid/sgid privileges */
+-    if (getuid() != geteuid() || getgid() != getegid()) {
+-	errno = ENOTSUP;
+-	goto exit;
+-    }
+-#endif
+ #endif
+ 
+ #ifdef	MYDEBUG

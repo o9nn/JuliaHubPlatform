@@ -1,0 +1,192 @@
+The Wine development release 7.0-rc2 is now available.
+
+What's new in this release (see below for details):
+  - Bug fixes only, we are in code freeze.
+
+The source is available from the following locations:
+
+  https://dl.winehq.org/wine/source/7.0/wine-7.0-rc2.tar.xz
+  http://mirrors.ibiblio.org/wine/source/7.0/wine-7.0-rc2.tar.xz
+
+Binary packages for various distributions will be available from:
+
+  https://www.winehq.org/download
+
+You will find documentation on https://www.winehq.org/documentation
+
+You can also get the current source directly from the git
+repository. Check https://www.winehq.org/git for details.
+
+Wine is available thanks to the work of many people. See the file
+AUTHORS in the distribution for the complete list.
+
+----------------------------------------------------------------
+
+Bugs fixed in 7.0-rc2 (total 34):
+
+  29934  Weird Worlds: Launcher no longer launches the game
+  37255  Proteus 8 Access violation in module 'VGDVC.DLL'
+  48631  Multiple games display text as squares (Death to Spies: Moment of Truth, Shadow Warrior, Resident Evil 4 HD)
+  50526  ConEmu wineconsole Ctrl+m has different behavior
+  50714  YooSee CMS client 10.0.0.53 crashes after login since Wine 5.12 (ntdll built as PE)
+  50906  Her Story: crashes when seeking in video
+  51282  Samurai Shodown Reboot 2019: low gpu usage around 5-10% and low fps around 9-20fps
+  51296  Multiple applications (Cogmind, Photoshop, ...) render mouse cursor as black square
+  51380  The segment register tests fail in the wow32 ntdll:exception build
+  51409  Trails to Azure crashes when reaching main menu after video playback
+  51479  winedevice.exe crashes on prefix shutdown
+  51500  ntdll:exception test_wow64_context() randomly fails on Windows
+  51521  Installer of Tencent meeting crashes when using enter key in the license agreement screen.
+  51539  "server: Get the process entry point from the exe image info" breaks running if exe is loaded at a non-default address
+  51589  Buttons have no icons when using the Light Blue theme
+  51745  Xbox Controller no longer recognised
+  51766  ^C in gdb mode makes debugger quit
+  51790  MSI is no longer able to detect correct architecture for a custom action DLL
+  51910  Keyboard Input Partially Broken
+  51930  Final Fantasy XIV audio broken in wine-6.20
+  52008  Broken symlink to 'My Documents' causes app to crash
+  52020  Multiple games crash after intros (Borderlands GOTY Enhanced, Dark Souls: Remastered, Steel Division: Normandy 44)
+  52038  Sonic Adventure DX (2004) crashes after intro cutscene
+  52041  DAVAR4 crashes when moving mouse over document window scrollbars
+  52082  Ace Ventura (CD-ROM) crashes on start
+  52112  Final Fantasy XIV failing to boot
+  52140  configure fails to detect libldap 2.5+
+  52161  ntdll:om fails when run without elevated privileges
+  52165  mfplat:mfplat has failures in test_sample_allocator_d3d12() on Windows 10 1709
+  52166  mfplat:mfplat has a failure in test_d3d12_surface_buffer() on Windows 10 1709
+  52187  wine-mono's WPF tests hang (broken handling of IDWriteTextAnalysisSource callbacks in analyzer)
+  52195  comctl32:propsheet fails in the Hebrew locale
+  52206  Logos 9 Bible Software (.NET 4.7 app) external links don't open web browser
+  52207  HICON leak in CopyImage causes TheBat! to crash after a while
+
+----------------------------------------------------------------
+
+Changes since 7.0-rc1:
+
+Alex Henrie (3):
+      comctl32/tests: Permit larger propsheet buffers.
+      kernel32/tests: Split up checks in flush_proc function.
+      advapi32/tests: Accept more broken values in another RegEnumValue name overflow test.
+
+Alexandre Julliard (16):
+      ntdll/tests: Mark a failing test as todo.
+      krnl386.exe: Page-align the GlobalAlloc() size when the selector limit is in pages.
+      winebrowser: Try xdg-open before /usr/bin/open.
+      ntdll: Fix the RtlCreateTimer() argument order.
+      ntdll/tests: Fix some exception test failures on Windows.
+      ntdll/tests: Fix some directory test failures on Windows.
+      ntdll/tests: Fix some wow64 test failures on Windows.
+      ntdll/tests: Mark a failing test as todo.
+      kernel32/tests: Fix some test failures on Windows.
+      kernel32/tests: Remove an unreliable test.
+      kernelbase/tests: Fix some test failures on Windows.
+      schedsvc/tests: Fix a test failure on recent Windows versions.
+      advapi32/tests: Skip event log tests on Windows when access is not allowed.
+      crypt32/tests: Mark a failing test as todo.
+      wininet/tests: Mark a failing test as todo.
+      d3d11/tests: Mark a couple of failing tests as todo.
+
+Alistair Leslie-Hughes (1):
+      dbghelp: Fix use after free.
+
+Andrey Gusev (3):
+      hlink/tests: Fix a typo in a comment.
+      wmc: Fix a typo in a comment.
+      wined3d: Add WINED3DFMT_R11G11B10_FLOAT vertex format.
+
+Bernhard Übelacker (1):
+      inetmib1: Fix endianess issue with dwLocalAddr and dwLocalPort.
+
+Chilung Chan (2):
+      po: Update Traditional Chinese translation.
+      xcopy: Add /k in Syntax message of STRING_HELP string.
+
+Connor McAdams (1):
+      ws2_32: Return WSAEINVAL from GetAddrInfoExOverlappedResult if overlapped is NULL.
+
+Conor McCarthy (1):
+      wined3d: Do not bind buffers in state_cb() if the shader is not set.
+
+Dmitry Timoshkov (1):
+      shell32: Add support for IDragSourceHelper2 interface.
+
+Eric Pouech (7):
+      start: Ignore Ctrl-C and let the child decides what to do with it.
+      winedbg: In gdb proxy mode, ignore ctrl-c.
+      dbghelp: Silence some FIXMEs.
+      msvcrt: Fix double-free and memory leak in type_info destructor.
+      ntdll: Use proper names for magic constants.
+      winedump: Support dumping quad word values in enumerations.
+      server/console: Ensure conhost has created the TTY input stream before waiting.
+
+Esme Povirk (3):
+      dwrite: Avoid calling memcpy with NULL source.
+      dwrite: Fix possible use of uninitialized memory.
+      dwrite: Account for position != 0 in fetch loops.
+
+Hans Leidekker (1):
+      configure: Check for libldap instead of libldap_r.
+
+Henri Verbeet (1):
+      wined3d: Release the allocator lock on error in wined3d_allocator_chunk_vk_map().
+
+Hugh McMaster (1):
+      conhost: Process Ctrl-M key input.
+
+Huw D. M. Davies (2):
+      riched20: Return the nearest char pos if the coords are outside the format rect.
+      riched20: Defer releasing the host if inside a notify callback.
+
+Jacek Caban (3):
+      conhost: Remove unused extra_size argument from set_output_info.
+      winebuild: Allow using clang for as command.
+      ntdll: Don't use inline assembly in do_cpuid.
+
+Jinoh Kang (1):
+      ntdll/tests: Fix access denied error in unprivileged mode.
+
+John Sullivan (1):
+      user32: Call DestroyIcon() to delete icon handles in CopyImage().
+
+Matteo Bruni (3):
+      ddraw: Pass the sub resource count to ddraw_surface_reserve_memory().
+      ddraw: Add a trace to ddraw_surface_update_frontbuffer().
+      ddraw: Fix typo in a comment.
+
+Nikolay Sivov (4):
+      mfplat/tests: Use CRT allocation functions.
+      mfplat/tests: Allocate test callbacks.
+      mfplat/tests: Fix test crash on old Windows 10 systems.
+      mfplat/tests: Handle ResetDevice() failure when used with D3D12 device.
+
+Paul Gofman (3):
+      ntdll: Add stub for NtSetDebugFilterState().
+      mountmgr.sys: Avoid use after free in dhcp4_config_request().
+      ntdll: Don't set socket IO status after queuing async.
+
+Piotr Caban (3):
+      concrt140/tests: Fix race in _Timer tests.
+      msvcrt: Fix _strdate implementation in Hindi locale.
+      msvcrt: Fix _strtime implementation in Hindi locale.
+
+Roberto Pungartnik (2):
+      po: Update Brazilian Portuguese translation.
+      po: Update Spanish translation.
+
+Rémi Bernon (5):
+      user32: Update rawinput devices on WM_INPUT_DEVICE_CHANGE reception.
+      user32: Throttle device list updates from GetRawInputDeviceList.
+      winepulse.drv: Stop writing the same data again on underflow.
+      winepulse.drv: Keep buffer size separate from allocated size.
+      winepulse.drv: Write data to pulse in pulse_release_render_buffer.
+
+Zebediah Figura (5):
+      winegstreamer: Acquire all of the flushing locks in GST_Seeking_SetPositions().
+      winegstreamer: Return E_UNEXPECTED when calling IWMReader::Stop() if no stream is open.
+      qasf/tests: Test that the DMO wrapper (de)commits its source pins' allocators when changing state.
+      user32: Do not use SetDIBits() in create_masked_bitmap().
+      user32: Free the created icon handle when using LR_COPYFROMRESOURCE.
+
+--
+Alexandre Julliard
+julliard@winehq.org

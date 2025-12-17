@@ -1,0 +1,47 @@
+{
+  "apiVersion": "vlabs",
+  "properties": {
+    "orchestratorProfile": {
+      "orchestratorType": "Kubernetes",
+      "orchestratorRelease": "1.10",
+      "kubernetesConfig": {
+        "useManagedIdentity": true,
+        "addons": [
+          {
+            "name": "cluster-autoscaler",
+            "enabled": true,
+            "config": {
+              "min-nodes": "1",
+              "max-nodes": "5",
+              "scan-interval": "10s"
+            }
+          }
+        ]
+      }
+    },
+    "masterProfile": {
+      "count": 1,
+      "dnsPrefix": "",
+      "vmSize": "Standard_DS2_v2"
+    },
+    "agentPoolProfiles": [
+      {
+        "name": "agentpool",
+        "count": 1,
+        "vmSize": "Standard_DS2_v2",
+        "availabilityProfile": "VirtualMachineScaleSets",
+        "storageProfile": "ManagedDisks"
+      }
+    ],
+    "linuxProfile": {
+      "adminUsername": "azureuser",
+      "ssh": {
+        "publicKeys": [
+          {
+            "keyData": ""
+          }
+        ]
+      }
+    }
+  }
+}

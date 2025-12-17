@@ -1,0 +1,38 @@
+language: julia
+os:
+  - linux
+julia:
+  - 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+    - downloads
+env:
+  global:
+    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+    - BINARYBUILDER_AUTOMATIC_APPLE=true
+sudo: required
+
+# Before anything else, get the latest versions of things
+before_script:
+  - julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+
+script:
+  - julia build_tarballs.jl
+
+deploy:
+  provider: releases
+  api_key:
+    # Note; this api_key is only valid for JuliaDatabases/SQLiteBuilder; you need
+    # to make your own: https://docs.travis-ci.com/user/deployment/releases/
+    secure: TImWR+gaJt7ql0+fQG1PhgpQA66L7L8kAz3hcgZu8eIBwWA0dLKw1UUAT5gscHLDoLcj8EwFWMy3qSG7OiHR+NjfzcdHpNs9brZdP3SBmCtDE/Os9/dJgb6FiRlnxSIaCtlD8pSANFNkG0yXKdPf47HwyMsY4Q38EBmbmiDjqEs2gTtra+xkWK6vm7Q1tOHme2VkUt+4bcz/slc1bO45mJVYMS8DHOJympehigYauHdBGadRUF//WxpPzG68ouqh64da0lGkJt3HYLXAU8LMuJ7tOE5AGEnFMlaTpwt0bQIGIhpDX0sSxCCAYuMMn3jLkYdje/wGE+W33XgrlhQt2Fs3Dy79GC/RbvQBBN47VQtl8BSUWGlza8ZBO0NAo8xeWpjK7qAniqrLTgpbX0btRSZRfx/4nx9EioKh1tfJCEcchk3pnECzNx3odm+pKbhLtn21F7qRoLDUDWEv5bGsV5oZU5+WPQu2xjjmWotPaioYOg3EhJvbucZMr93Wtmub4b0RBq9JHH0smny2Z6wFdPPNC6b0N1sVga8m/gtA7TgNnOHNH4Zec6Q7vklfaTtRNnqLEIFzpJnaydshIexR7LSkT0hWUE/e/W8LtBBfefp8Oh7IF82ZcdItQ1oZ7iS+49p7aS6O5PVaec7Qu1jei2jkDEGBLVrz+ImCOF16l3g=
+  file_glob: true
+  file: products/*
+  skip_cleanup: true
+  on:
+    repo: JuliaDatabases/SQLiteBuilder
+    tags: true

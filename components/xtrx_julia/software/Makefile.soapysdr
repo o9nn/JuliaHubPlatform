@@ -1,0 +1,70 @@
+soapysdr/.git:
+	git submodule update --init soapysdr
+get-soapysdr: soapysdr/.git
+
+SOAPYSDR_PREFIX ?= $(PREFIX)
+SOAPYSDR_LIB = $(SOAPYSDR_PREFIX)/lib/libSoapySDR.so
+$(SOAPYSDR_LIB): soapysdr/.git
+	$(RM) -r soapysdr/build
+	mkdir -p soapysdr/build
+	cmake -DCMAKE_INSTALL_PREFIX=$(SOAPYSDR_PREFIX) \
+	      -DCMAKE_INSTALL_RPATH='$$ORIGIN/../lib' \
+		  -DCMAKE_BUILD_TYPE=Debug \
+		  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		  -S soapysdr \
+		  -B soapysdr/build
+	$(MAKE) -C soapysdr/build install
+soapysdr: $(SOAPYSDR_LIB)
+clean-soapysdr:
+	-$(MAKE) -C soapysdr/build clean
+	$(RM) $(SOAPYSDR_LIB)
+clean: clean-soapysdr
+
+SOAPYSDR_XTRX_PREFIX ?= $(PREFIX)
+SOAPYSDR_XTRX_LIB = $(SOAPYSDR_XTRX_PREFIX)/lib/SoapySDR/modules$(SOAPYSDR_MAJMIN)/libSoapyXTRX.so
+$(SOAPYSDR_XTRX_LIB): $(SOAPYSDR_LIB) $(LITEPCIE_LIB) $(LMS7002M_LIB)
+	$(RM) -r soapysdr-xtrx/build
+	mkdir -p soapysdr-xtrx/build
+	cmake -DCUDAToolkit_ROOT=$(CUDA_PREFIX) \
+		  -DUSE_CUDA=$(USE_CUDA) \
+		  -DSoapySDR_ROOT=$(SOAPYSDR_PREFIX) \
+		  -DLMS7002M_ROOT=$(LMS7002M_PREFIX) \
+		  -DCMAKE_INSTALL_PREFIX=$(SOAPYSDR_XTRX_PREFIX) \
+		  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		  -DCMAKE_BUILD_TYPE=Debug \
+		  -S soapysdr-xtrx \
+		  -B soapysdr-xtrx/build
+	$(MAKE) -C soapysdr-xtrx/build install
+soapysdr-xtrx: $(SOAPYSDR_XTRX_LIB)
+clean-soapysdr-xtrx:
+	-$(MAKE) -C soapysdr-xtrx/build clean
+	$(RM) $(SOAPYSDR_XTRX_LIB)
+clean: clean-soapysdr-xtrx
+
+SOAPYSDR_XTRX_LIME_LIB = $(SOAPYSDR_XTRX_PREFIX)/lib/SoapySDR/modules$(SOAPYSDR_MAJMIN)/libSoapyXTRXLime.so
+$(SOAPYSDR_XTRX_LIME_LIB): $(SOAPYSDR_LIB) $(LITEPCIE_LIB) $(LMS7002M_LIB) $(SOAPYLMS7_LIB)
+	$(RM) -r soapysdr-xtrx-lime/build
+	mkdir -p soapysdr-xtrx-lime/build
+	cmake -DCUDAToolkit_ROOT=$(CUDA_PREFIX) \
+		  -DUSE_CUDA=$(USE_CUDA) \
+		  -DSoapySDR_ROOT=$(SOAPYSDR_PREFIX) \
+		  -DLMS7002M_ROOT=$(LMS7002M_PREFIX) \
+		  -DLIME_ROOT=$(SOAPYSDR_PREFIX) \
+		  -DCMAKE_INSTALL_PREFIX=$(SOAPYSDR_XTRX_PREFIX) \
+		  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		  -DCMAKE_BUILD_TYPE=Debug \
+		  -S soapysdr-xtrx-lime \
+		  -B soapysdr-xtrx-lime/build
+	$(MAKE) -C soapysdr-xtrx-lime/build install
+soapysdr-xtrx-lime: $(SOAPYSDR_XTRX_LIME_LIB)
+clean-soapysdr-xtrx-lime:
+	-$(MAKE) -C soapysdr-xtrx-lime/build clean
+	$(RM) $(SOAPYSDR_XTRX_LIME_LIB)
+clean: clean-soapysdr-xtrx-lime
+
+xtrxjl:
+	julia +1.7 --project=./XTRX.jl/gen/ ./XTRX.jl/gen/gen.jl
+
+print-soapysdr-plugin-path:
+	@echo $(dir $(SOAPYSDR_XTRX_LIB))
+

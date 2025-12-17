@@ -1,0 +1,51 @@
+["0-0.0.1"]
+julia = "1.5.0-1"
+
+["0-0.0.3"]
+Distributions = "0.24"
+
+[0-2]
+FFTW = "1.2.0-1"
+ForwardDiff = "0.10"
+Parameters = "0.12"
+RecursiveArrayTools = "2.7.0-2"
+Statistics = "1.4.0-1"
+
+["0-2.1"]
+QuasiMonteCarlo = "0.2"
+
+["0.0.2-1.2"]
+julia = "1"
+
+["0.0.4-0"]
+Distributions = "0.23-0.24"
+
+[1-2]
+KernelDensity = "0.6"
+Trapz = "2"
+
+["1-2.1.4"]
+StatsBase = "0.33"
+
+["1.0"]
+Distributions = "0.23-0.24"
+
+["1.1-2"]
+Distributions = "0.23-0.25"
+
+["1.3-2"]
+julia = "1.6.0-1"
+
+["2.1.5-2"]
+StatsBase = "0.33-0.34"
+
+["2.2-2"]
+Combinatorics = "1"
+QuasiMonteCarlo = "0.2-0.3"
+ThreadsX = "0.1"
+
+["2.2-2.3"]
+Copulas = "0.1"
+
+["2.4-2"]
+Copulas = "0.1.13"

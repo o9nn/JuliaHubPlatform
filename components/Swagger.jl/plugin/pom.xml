@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.juliacomputing.swagger.codegen</groupId>
+  <artifactId>julia-swagger-codegen</artifactId>
+  <packaging>jar</packaging>
+  <version>0.0.7</version>
+  <name>julia-swagger-codegen</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <!-- https://mvnrepository.com/artifact/io.swagger/swagger-models -->
+    <dependency>
+        <groupId>io.swagger</groupId>
+        <artifactId>swagger-models</artifactId>
+        <version>1.6.2</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/io.swagger/swagger-codegen -->
+    <dependency>
+        <groupId>io.swagger</groupId>
+        <artifactId>swagger-codegen</artifactId>
+        <version>2.4.19</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/io.swagger/swagger-codegen-cli -->
+    <dependency>
+        <groupId>io.swagger</groupId>
+        <artifactId>swagger-codegen-cli</artifactId>
+        <version>2.4.19</version>
+    </dependency>
+  </dependencies>
+  <properties>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+  </properties>
+</project>

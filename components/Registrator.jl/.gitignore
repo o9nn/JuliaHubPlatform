@@ -1,0 +1,11 @@
+/tmp
+/registries
+/packages
+*.secret.toml
+oldlogs/
+*.log
+nohup.out
+run/stop*
+docs/build/
+docs/Manifest.toml
+.vscode

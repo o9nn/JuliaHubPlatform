@@ -1,0 +1,322 @@
+---
+title: OREGO Work-Precision Diagrams
+author: Chris Rackauckas
+---
+
+```julia
+using OrdinaryDiffEq, DiffEqDevTools, ParameterizedFunctions, Plots, ODE, ODEInterfaceDiffEq, LSODA, Sundials
+gr() #gr(fmt=:png)
+using LinearAlgebra, StaticArrays
+
+f = @ode_def Orego begin
+  dy1 = p1*(y2+y1*(1-p2*y1-y2))
+  dy2 = (y3-(1+y1)*y2)/p1
+  dy3 = p3*(y1-y3)
+end p1 p2 p3
+
+p = SA[77.27,8.375e-6,0.161]
+prob = ODEProblem{true, SciMLBase.FullSpecialize}(f,[1.0,2.0,3.0],(0.0,30.0),p)
+probstatic = ODEProblem{false}(f,SA[1.0,2.0,3.0],(0.0,30.0),p)
+
+sol = solve(prob,CVODE_BDF(),abstol=1/10^14,reltol=1/10^14)
+sol2 = solve(probstatic,Rodas5P(),abstol=1/10^14,reltol=1/10^14)
+probs = [prob,probstatic]
+test_sol = [sol,sol2];
+
+abstols = 1.0 ./ 10.0 .^ (4:11)
+reltols = 1.0 ./ 10.0 .^ (1:8);
+```
+
+```julia
+plot_prob = ODEProblem(f,[1.0,2.0,3.0],(0.0,400.0),p)
+sol = solve(plot_prob,CVODE_BDF())
+plot(sol,yscale=:log10)
+```
+
+## Omissions and Tweaking
+
+The following were omitted from the tests due to convergence failures. ODE.jl's
+adaptivity is not able to stabilize its algorithms, while
+GeometricIntegratorsDiffEq has not upgraded to Julia 1.0.
+GeometricIntegrators.jl's methods used to be either fail to converge at
+comparable dts (or on some computers errors due to type conversions).
+
+```julia
+#sol = solve(prob,ode23s()); println("Total ODE.jl steps: $(length(sol))")
+#using GeometricIntegratorsDiffEq
+#try
+#    sol = solve(prob,GIRadIIA3(),dt=1/10)
+#catch e
+#    println(e)
+#end
+```
+
+```julia
+sol = solve(prob,ARKODE(),abstol=1e-5,reltol=1e-1);
+```
+
+```julia
+sol = solve(prob,ARKODE(nonlinear_convergence_coefficient = 1e-3),abstol=1e-5,reltol=1e-1);
+```
+
+```julia
+sol = solve(prob,ARKODE(order=3),abstol=1e-5,reltol=1e-1);
+```
+
+```julia
+sol = solve(prob,ARKODE(order=3,nonlinear_convergence_coefficient = 1e-5),abstol=1e-5,reltol=1e-1);
+```
+
+```julia
+sol = solve(prob,ARKODE(order=5),abstol=1e-5,reltol=1e-1);
+```
+
+The stabilized explicit methods are not stable enough to handle this problem
+well. While they don't diverge, they are really slow.
+
+```julia
+setups = [
+          #Dict(:alg=>ROCK2())    #Unstable
+          #Dict(:alg=>ROCK4())    #needs more iterations
+          #Dict(:alg=>ESERK5()),
+          ]
+```
+
+The EPIRK and exponential methods also fail:
+
+```julia
+sol = solve(prob,EXPRB53s3(),dt=2.0^(-8));
+sol = solve(prob,EPIRK4s3B(),dt=2.0^(-8));
+sol = solve(prob,EPIRK5P2(),dt=2.0^(-8));
+```
+
+PDIRK44 also fails
+
+```julia
+sol = solve(prob,PDIRK44(),dt=2.0^(-8));
+```
+
+## High Tolerances
+
+This is the speed when you just want the answer.
+
+```julia
+abstols = 1.0 ./ 10.0 .^ (5:8)
+reltols = 1.0 ./ 10.0 .^ (1:4);
+setups = [Dict(:alg=>Rosenbrock23()),
+          Dict(:alg=>Rosenbrock23(), :prob_choice => 2),
+          Dict(:alg=>FBDF()),
+          Dict(:alg=>QNDF()),
+          Dict(:alg=>TRBDF2()),
+          Dict(:alg=>CVODE_BDF()),
+          Dict(:alg=>rodas()),
+          Dict(:alg=>radau()),
+          Dict(:alg=>RadauIIA5()),
+          Dict(:alg=>ROS34PW1a()),
+          Dict(:alg=>lsoda()),
+          ]
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                      save_everystep=false,appxsol=test_sol,maxiters=Int(1e5),numruns=10)
+plot(wp)
+```
+
+```julia
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;dense = false,verbose=false,
+                      appxsol=test_sol,maxiters=Int(1e5),error_estimate=:l2,numruns=10)
+plot(wp)
+```
+
+```julia
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                      appxsol=test_sol,maxiters=Int(1e5),error_estimate=:L2,numruns=10)
+plot(wp)
+```
+
+```julia
+setups = [Dict(:alg=>Rosenbrock23()),
+          Dict(:alg=>Rosenbrock23(), :prob_choice => 2),
+          Dict(:alg=>Kvaerno3()),
+          Dict(:alg=>CVODE_BDF()),
+          Dict(:alg=>KenCarp4()),
+          Dict(:alg=>TRBDF2()),
+          Dict(:alg=>KenCarp3()),
+          Dict(:alg=>lsoda()),
+    # Dict(:alg=>SDIRK2()), # Removed because it's bad
+          Dict(:alg=>radau())]
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                      save_everystep=false,appxsol=test_sol,maxiters=Int(1e5),numruns=10)
+plot(wp)
+```
+
+```julia
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;dense = false,verbose = false,
+                      appxsol=test_sol,maxiters=Int(1e5),error_estimate=:l2,numruns=10)
+plot(wp)
+```
+
+```julia
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                      appxsol=test_sol,maxiters=Int(1e5),error_estimate=:L2,numruns=10)
+plot(wp)
+```
+
+```julia
+setups = [Dict(:alg=>Rosenbrock23()),
+          Dict(:alg=>Rosenbrock23(), :prob_choice => 2),
+          Dict(:alg=>KenCarp5()),
+          Dict(:alg=>KenCarp4()),
+          Dict(:alg=>KenCarp4(), :prob_choice => 2),
+          Dict(:alg=>KenCarp3()),
+          Dict(:alg=>ARKODE(order=5)),
+          Dict(:alg=>ARKODE(nonlinear_convergence_coefficient = 1e-6)),
+          Dict(:alg=>ARKODE(nonlinear_convergence_coefficient = 1e-5,order=3))
+          ]
+names = ["Rosenbrock23" "Rosenbrock23 Static" "KenCarp5" "KenCarp4" "KenCarp4 Static" "KenCarp3" "ARKODE5" "ARKODE4" "ARKODE3"]
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                      names=names,
+                      save_everystep=false,appxsol=test_sol,maxiters=Int(1e5),numruns=10)
+plot(wp)
+```
+
+### Low Tolerances
+
+This is the speed at lower tolerances, measuring what's good when accuracy is needed.
+
+```julia
+abstols = 1.0 ./ 10.0 .^ (7:13)
+reltols = 1.0 ./ 10.0 .^ (4:10)
+
+setups = [
+          Dict(:alg=>FBDF()),
+          Dict(:alg=>QNDF()),
+          Dict(:alg=>Rodas4P()),
+          Dict(:alg=>CVODE_BDF()),
+          Dict(:alg=>ddebdf()),
+          Dict(:alg=>Rodas4()),
+          Dict(:alg=>Rodas4(), :prob_choice => 2),
+          Dict(:alg=>Rodas5P()),
+          Dict(:alg=>Rodas5P(), :prob_choice => 2),
+          Dict(:alg=>rodas()),
+          Dict(:alg=>radau()),
+          Dict(:alg=>RadauIIA5()),
+          Dict(:alg=>lsoda()),
+]
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                      save_everystep=false,appxsol=test_sol,maxiters=Int(1e5),numruns=10)
+plot(wp)
+```
+
+```julia
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;verbose=false,
+                      dense=false,appxsol=test_sol,maxiters=Int(1e5),error_estimate=:l2,numruns=10)
+plot(wp)
+```
+
+```julia
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                      appxsol=test_sol,maxiters=Int(1e5),error_estimate=:L2,numruns=10)
+plot(wp)
+```
+
+```julia
+setups = [Dict(:alg=>GRK4A()),
+          Dict(:alg=>Rodas5()),
+          Dict(:alg=>Rodas5P()),
+          Dict(:alg=>Rodas5P(), :prob_choice => 2),
+          Dict(:alg=>Kvaerno5()),
+          Dict(:alg=>CVODE_BDF()),
+          Dict(:alg=>KenCarp4()),
+          Dict(:alg=>KenCarp4(), :prob_choice => 2),
+          Dict(:alg=>KenCarp5()),
+          Dict(:alg=>Rodas4()),
+          Dict(:alg=>Rodas4(), :prob_choice => 2),
+          Dict(:alg=>lsoda()),
+          Dict(:alg=>radau()),
+          Dict(:alg=>ImplicitEulerExtrapolation()),
+          Dict(:alg=>ImplicitEulerBarycentricExtrapolation()),
+          Dict(:alg=>ImplicitHairerWannerExtrapolation()),
+          ]
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                      save_everystep=false,appxsol=test_sol,maxiters=Int(1e5),numruns=10)
+plot(wp)
+```
+
+```julia
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;verbose=false,
+                      dense=false,appxsol=test_sol,maxiters=Int(1e5),error_estimate=:l2,numruns=10)
+plot(wp)
+```
+
+```julia
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                      appxsol=test_sol,maxiters=Int(1e5),error_estimate=:L2,numruns=10)
+plot(wp)
+```
+
+The following algorithms were removed since they failed.
+
+```julia
+#setups = [Dict(:alg=>Hairer4()),
+          #Dict(:alg=>Hairer42()),
+          #Dict(:alg=>Rodas3()),
+          #Dict(:alg=>Kvaerno4()),
+          #Dict(:alg=>Cash4())
+#]
+#wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+#                      save_everystep=false,appxsol=test_sol,maxiters=Int(1e5),numruns=10)
+#plot(wp)
+```
+
+Multithreading benchmarks with Parallel Extrapolation Methods
+
+```julia
+#Checking for threading
+print(Threads.nthreads())
+```
+
+```julia
+#Setting BLAS to one thread to measure gains
+LinearAlgebra.BLAS.set_num_threads(1)
+
+abstols = 1.0 ./ 10.0 .^ (10:12)
+reltols = 1.0 ./ 10.0 .^ (7:9)
+
+setups = [
+            Dict(:alg=>CVODE_BDF()),
+            Dict(:alg=>KenCarp4()),
+            Dict(:alg=>Rodas4()),
+            Dict(:alg=>Rodas4(), :prob_choice => 2),
+            Dict(:alg=>Rodas5P()),
+            Dict(:alg=>Rodas5P(), :prob_choice => 2),
+            Dict(:alg=>QNDF()),
+            Dict(:alg=>lsoda()),
+            Dict(:alg=>radau()),
+            Dict(:alg=>seulex()),
+            Dict(:alg=>ImplicitEulerExtrapolation(init_order = 4,threading = OrdinaryDiffEq.PolyesterThreads())),
+            Dict(:alg=>ImplicitEulerExtrapolation(init_order = 4,threading = false)),
+            Dict(:alg=>ImplicitEulerBarycentricExtrapolation(init_order = 4, threading = OrdinaryDiffEq.PolyesterThreads())),
+            Dict(:alg=>ImplicitEulerBarycentricExtrapolation(init_order = 4, threading = false)),
+            Dict(:alg=>ImplicitHairerWannerExtrapolation(init_order = 5,threading = OrdinaryDiffEq.PolyesterThreads())),
+            Dict(:alg=>ImplicitHairerWannerExtrapolation(init_order = 5,threading = false)),
+            ]
+
+solnames = ["CVODE_BDF","KenCarp4","Rodas4","Rodas4 Static","Rodas%P","Rodas5P Static","QNDF","lsoda","radau","seulex","ImplEulerExtpl (threaded)", "ImplEulerExtpl (non-threaded)",
+            "ImplEulerBaryExtpl (threaded)","ImplEulerBaryExtpl (non-threaded)","ImplHWExtpl (threaded)","ImplHWExtpl (non-threaded)"]
+
+wp = WorkPrecisionSet(probs,abstols,reltols,setups;
+                    names = solnames,save_everystep=false,appxsol=test_sol,maxiters=Int(1e5),numruns=10)
+
+plot(wp, title = "Implicit Methods: OREGO",legend=:outertopleft,size = (1000,500),
+     xticks = 10.0 .^ (-15:1:1),
+     yticks = 10.0 .^ (-6:0.3:5),
+     bottom_margin= 5Plots.mm)
+```
+
+### Conclusion
+
+At high tolerances, `Rosenbrock23` hits the the error estimates and is fast. At lower tolerances and normal user tolerances, `Rodas4` and `Rodas5` are extremely fast. When you get down to `reltol=1e-9` `radau` begins to become as efficient as `Rodas4`, and it continues to do well below that.
+
+```julia, echo = false
+using SciMLBenchmarks
+SciMLBenchmarks.bench_footer(WEAVE_ARGS[:folder],WEAVE_ARGS[:file])
+```

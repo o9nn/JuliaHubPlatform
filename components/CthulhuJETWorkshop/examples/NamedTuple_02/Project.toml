@@ -1,0 +1,12 @@
+name = "NamedTuple_02"
+uuid = "0851e3dd-9667-4570-b521-3db27245f9b9"
+version = "0.1.0"
+authors = ["Cody Tapscott <topolarity@tapscott.me>"]
+
+[deps]
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
+[compat]
+JSON = "0.21.4"
+LinearAlgebra = "1.12.0"

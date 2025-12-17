@@ -1,0 +1,11 @@
+*.o
+*.dSYM
+
+.*.swp
+
+**/*.o
+**/*.a
+rx_fm
+rx_power
+rx_sdr
+_build/

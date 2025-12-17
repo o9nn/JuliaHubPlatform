@@ -1,0 +1,86 @@
+[0]
+Distributions = "0.25"
+Optim = "1.4.0-1"
+PDMats = "0.11"
+
+["0-0.2"]
+Statistics = "1"
+julia = "1"
+
+["0-0.2.2"]
+PSIS = "0.1"
+
+["0-0.3"]
+StatsFuns = "0.9"
+
+["0-0.7.5"]
+StatsBase = "0.33"
+
+["0.2.3-0.3.0"]
+PSIS = "0.2"
+
+["0.3-0"]
+ForwardDiff = "0.10"
+Statistics = "1.6.0-1"
+julia = "1.6.0-1"
+
+["0.3-0.4.2"]
+GalacticOptim = "2"
+
+["0.3-0.6"]
+AbstractDifferentiation = "0.4"
+
+["0.3.1-0.3.4"]
+PSIS = "0.2-0.3"
+
+["0.3.3-0"]
+Requires = "1"
+
+["0.3.5-0.4.4"]
+PSIS = "0.2-0.4"
+
+["0.3.6-0"]
+Folds = "0.2"
+Transducers = "0.4.5-0.4"
+
+["0.4-0"]
+ProgressLogging = "0.1.4-0.1"
+UnPack = "1"
+
+["0.4-0.7.1"]
+IrrationalConstants = "0.1.1-0.1"
+
+["0.4.1-0.7.2"]
+Accessors = "0.1"
+
+["0.4.3-0"]
+SciMLBase = "1.8.1-1"
+
+["0.4.3-0.4.5"]
+GalacticOptim = "3"
+GalacticOptimJL = "0.1"
+
+["0.4.5-0.5.2"]
+PSIS = "0.2-0.5"
+
+["0.4.6-0"]
+Optimization = "3"
+OptimizationOptimJL = "0.1"
+
+["0.5.3-0.5.4"]
+PSIS = "0.2-0.6"
+
+["0.5.5-0.7.4"]
+PSIS = "0.2-0.7"
+
+["0.7-0"]
+LogDensityProblems = "2"
+
+["0.7.2-0"]
+IrrationalConstants = "0.1.1-0.2"
+
+["0.7.5-0"]
+PSIS = "0.2-0.9"
+
+["0.7.6-0"]
+StatsBase = "0.33-0.34"

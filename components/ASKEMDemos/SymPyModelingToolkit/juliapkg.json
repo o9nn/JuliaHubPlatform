@@ -1,0 +1,14 @@
+{
+    "julia": "1.9",
+    "packages": {
+        "ModelingToolkit": {
+            "uuid": "961ee093-0014-501f-94e3-6117800e7a78"
+        },
+        "DifferentialEquations": {
+            "uuid": "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+        },
+        "SymPyPythonCall":{
+            "uuid": "bc8888f7-b21e-4b7c-a06a-5d9c9496438c"
+        }
+    }
+}

@@ -1,0 +1,7 @@
+[0]
+Statistics = "1"
+julia = "1"
+
+["0.2-0"]
+IterativeSolvers = "0.9"
+PositiveFactorizations = "0.2"

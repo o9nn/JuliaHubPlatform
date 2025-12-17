@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches: "master"
+    tags: ["*"]
+    paths:
+      - '.github/workflows/ci.yml'
+      - '*.toml'
+      - 'src/**'
+      - 'test/**'
+  pull_request:
+    paths:
+      - '.github/workflows/ci.yml'
+      - '*.toml'
+      - 'src/**'
+      - 'test/**'
+  release:
+
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: always.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BINARYBUILDER_AUTOMATIC_APPLE: true
+
+jobs:
+  test:
+    name: Julia ${{ matrix.julia-version }} - x64 - runner ${{ matrix.runner }} - SquashFS ${{ matrix.squashfs }}
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    env:
+      BINARYBUILDER_RUNNER: ${{ matrix.runner }}
+      BINARYBUILDER_USE_SQUASHFS: ${{ matrix.squashfs }}
+      # Run full tests only when we use the packed shards, because we constantly
+      # run out of disk on the free GitHub-hosted runners.
+      BINARYBUILDER_FULL_SHARD_TEST: ${{ matrix.squashfs }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Add a job that uses the privileged builder with squashfs shards
+          - runner: privileged
+            squashfs: true
+            julia-version: "1.7"
+
+          - runner: privileged
+            squashfs: true
+            julia-version: "1.8"
+
+          - runner: privileged
+            squashfs: true
+            julia-version: "1.9"
+
+          - runner: privileged
+            squashfs: true
+            julia-version: "1.10"
+
+          # - runner: privileged
+          #   squashfs: true
+          #   julia-version: "nightly"
+
+          # Add a job that uses the unprivileged builder with unpacked shards
+          - runner: unprivileged
+            squashfs: false
+            julia-version: "1.7"
+
+          # Add a job that uses the docker builder with unpacked shards
+          - runner: docker
+            squashfs: false
+            julia-version: "1.7"
+
+    steps:
+      - run: sudo rm -rf /opt/*
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.julia-version }}
+          arch: x64
+      # We can't cache artifacts at the moment, it'd require more than 10 GiB.
+      # - uses: julia-actions/cache@v1
+      #   # For the time being cache artifacts only for squashfs, we need too much
+      #   # storage for the unpacked shards
+      #   if: ${{ matrix.squashfs == true }}
+      #   with:
+      #     # Reserve entire cache to artifacts
+      #     cache-name: ${{ matrix.squashfs }}
+      #     cache-artifacts: "true"
+      #     cache-packages: "false"
+      #     cache-registries: "false"
+      - uses: julia-actions/julia-buildpkg@latest
+      - name: System info
+        run: |
+          args=(--check-bounds=yes --color=yes --depwarn=yes --inline=yes --project=@.)
+          # On Julia v1.8+ issue the code coverage info for this command.
+          if [[ "${{ matrix.julia-version }}" != "1.7" ]]; then
+              args+=(--code-coverage="@${PWD}")
+          fi
+          julia "${args[@]}" -e "using BinaryBuilderBase; BinaryBuilderBase.versioninfo()"
+      - name: Run tests
+        run: |
+          eval `ssh-agent`
+          chmod 0600 test/id_ecdsa_deploy_helloworld_c_jll_read_only
+          mkdir -p ~/.ssh
+          touch ~/.ssh/known_hosts
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-add test/id_ecdsa_deploy_helloworld_c_jll_read_only
+          julia --check-bounds=yes --color=yes --depwarn=yes --inline=yes --project=@. -e 'using Pkg; Pkg.instantiate(); Pkg.test(coverage=true)'
+      - uses: julia-actions/julia-uploadcodecov@v0.1
+        continue-on-error: true
+      - uses: julia-actions/julia-uploadcoveralls@v1.0
+        continue-on-error: true

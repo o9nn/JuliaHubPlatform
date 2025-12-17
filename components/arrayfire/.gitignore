@@ -1,0 +1,11 @@
+CMakeCache.txt
+CMakeFiles/
+build*/
+Makefile
+cmake_install.cmake
+**~
+GTAGS
+GRTAGS
+GPATH
+.dir-locals.el
+include/af/version.h

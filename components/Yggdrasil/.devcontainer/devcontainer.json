@@ -1,0 +1,15 @@
+{
+  "features": {
+    "ghcr.io/julialang/devcontainer-features/julia:1": {
+      "channel": "1.7"
+    },
+  },
+  "containerEnv": {
+    "JULIA_PROJECT": "${containerWorkspaceFolder}/.ci"
+  },
+  "hostRequirements": {
+    "gpu": "optional"
+  },
+  "privileged": true,
+  "onCreateCommand": "julia -e 'using Pkg; Pkg.precompile();'"
+}

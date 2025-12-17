@@ -1,0 +1,143 @@
+[[OpenPolicyAgent]]
+arch = "aarch64"
+git-tree-sha1 = "dd300ade95ec5e794445c1db78b03bb2562a1042"
+os = "macos"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "a580a864d70613949eae982019b5139a3475e189a854c2f13d70c0baf5c3d63f"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.aarch64-apple-darwin.tar.gz"
+[[OpenPolicyAgent]]
+arch = "aarch64"
+git-tree-sha1 = "4333f8998ad92ac13ec48f61f72ff3a29a7e66e0"
+libc = "glibc"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "807283227a5724136fcc875bd93f90cd5f6526cc42c286776a235d8b03ce78aa"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.aarch64-linux-gnu.tar.gz"
+[[OpenPolicyAgent]]
+arch = "aarch64"
+git-tree-sha1 = "bf34a45d00e2c80161d32241e9ae39b9727d40b4"
+libc = "musl"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "8189b4e281de4fff530441eb5f29e100617ecdb0760f6f18f87e4c245e983a2b"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.aarch64-linux-musl.tar.gz"
+[[OpenPolicyAgent]]
+arch = "armv6l"
+call_abi = "eabihf"
+git-tree-sha1 = "0a1cdf92fd070305a2e4175e0e691d81ebf64486"
+libc = "glibc"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "e3c0f1159687b0070bb3f36bc64593b7cd12d4a36e7372337f5d87969d2f5d2c"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.armv6l-linux-gnueabihf.tar.gz"
+[[OpenPolicyAgent]]
+arch = "armv6l"
+call_abi = "eabihf"
+git-tree-sha1 = "3724c2ea2a4696ddb686c994946b41bdee34f7ea"
+libc = "musl"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "91c5538f9a88fbb1152ece470941c6c06a964f90748a1b4aa95abd8b5985ed2a"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.armv6l-linux-musleabihf.tar.gz"
+[[OpenPolicyAgent]]
+arch = "armv7l"
+call_abi = "eabihf"
+git-tree-sha1 = "684ef981029c75dfe138c36ff09ca5a9bac3ad4f"
+libc = "glibc"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "4412cf5ca90cbbd939ced6cd77795cb62fa9bea11ee42e3308a03fdc631c3ceb"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.armv7l-linux-gnueabihf.tar.gz"
+[[OpenPolicyAgent]]
+arch = "armv7l"
+call_abi = "eabihf"
+git-tree-sha1 = "d9decf39fc27abb6dc7fb32dba844245262b0543"
+libc = "musl"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "f12f32a1dae853c530a2869cb9ca15111e74ebf0b814fa210e65e4f2248e3c8f"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.armv7l-linux-musleabihf.tar.gz"
+[[OpenPolicyAgent]]
+arch = "i686"
+git-tree-sha1 = "e53195b52a48a5304aa17e8f7169adfaccbc9f8a"
+libc = "glibc"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "830815b83973d61358cfba233de5550bee91e833f4f0ef72e602dc935273f2fc"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.i686-linux-gnu.tar.gz"
+[[OpenPolicyAgent]]
+arch = "i686"
+git-tree-sha1 = "d3337b597e336548535eaf41223e5633adcca0c4"
+libc = "musl"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "95b729d4f4448d41e1542754531311cc37ab442f6862e5acc0155fa11dc740cb"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.i686-linux-musl.tar.gz"
+[[OpenPolicyAgent]]
+arch = "i686"
+git-tree-sha1 = "990d253faaaf98fc19ac836c2e057b819f225822"
+os = "windows"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "4b6939b21e4c716167a5d2232dcf97e935b703d27b3adffb355105d83094c82f"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.i686-w64-mingw32.tar.gz"
+[[OpenPolicyAgent]]
+arch = "powerpc64le"
+git-tree-sha1 = "d69658baf1f5727b9701947f69558e09bf390cce"
+libc = "glibc"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "0eba158f7f0f31035d76ba55e87b2ce454edd11771b11d254d9fb8037c6cd25c"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.powerpc64le-linux-gnu.tar.gz"
+[[OpenPolicyAgent]]
+arch = "x86_64"
+git-tree-sha1 = "8f4f863f03bc9b04b4a00534eb96a1dfc4bf5794"
+os = "macos"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "ae0e457001e336163e9e2991199d68cb21f854fd47f96065f0d736e7c6b2fbf7"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.x86_64-apple-darwin.tar.gz"
+[[OpenPolicyAgent]]
+arch = "x86_64"
+git-tree-sha1 = "aee58f8ed0916e87a8487e72a24c6c1be2361d8d"
+libc = "musl"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "d58d609a03126b8a741e592af28ae0374de824493aae2355d8f3d5ace819d647"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.x86_64-linux-musl.tar.gz"
+[[OpenPolicyAgent]]
+arch = "x86_64"
+git-tree-sha1 = "d6b975e297ad6c455e221b7cffd1a4bb2706feb7"
+os = "freebsd"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "007f3132787082ade1551eacc7527283470adc2744d86095873004fd059fddd8"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.x86_64-unknown-freebsd.tar.gz"
+[[OpenPolicyAgent]]
+arch = "x86_64"
+git-tree-sha1 = "3eb9f02acb8c3730bfa632d2ac671b8f8616000b"
+os = "windows"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "b4f927462919716d6e51ec9532b56ff02e140072dbc1d519972b9d1397c350dd"
+    url = "https://github.com/JuliaBinaryWrappers/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.61.0+0/OpenPolicyAgent.v0.61.0.x86_64-w64-mingw32.tar.gz"
+[[OpenPolicyAgent]]
+arch = "x86_64"
+git-tree-sha1 = "153098e70708e2d139cc9e450d8a8c00004b3a60"
+libc = "glibc"
+os = "linux"
+
+    [[OpenPolicyAgent.download]]
+    sha256 = "f699e7ecdf23b8c072416c7548128cd6f831027cf85a0b8d52bea46f1e924f16"
+    url = "https://github.com/JuliaComputing/OpenPolicyAgent_jll.jl/releases/download/OpenPolicyAgent-v0.65.0+0/OpenPolicyAgent.v0.65.0.x86_64-linux-gnu.tar.gz"
